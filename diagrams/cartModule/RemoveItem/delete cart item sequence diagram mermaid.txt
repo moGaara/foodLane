@@ -1,0 +1,28 @@
+sequenceDiagram
+    actor Customer as Customer (Client)
+    participant Security as Security Filter
+    participant Controller
+    participant Service
+    participant Repo
+    participant DB
+
+    Customer->>Security: DELETE /api/v1/cart/items/{cartItemId}
+    Note over Security: Validate JWT & extract customerId
+
+    Security->>Controller: removeItem(cartItemId, customerId)
+    Controller->>Service: removeItemFromCart(cartItemId, customerId)
+
+    Service->>Repo: deleteByIdAndCustomerId(cartItemId, customerId)
+    Repo->>DB: DELETE FROM cart_item WHERE cart_item_id = ? AND cart_id = (SELECT cart_id FROM cart WHERE customer_id = ?)
+
+    alt Delete Count > 0
+        DB-->>Repo: 1 row affected
+        Repo-->>Service: 1
+        Service-->>Controller: Success
+        Controller-->>Customer: 200 Success
+    else Delete Count == 0
+        DB-->>Repo: 0 rows affected
+        Repo-->>Service: 0
+        Service-->>Controller: Throw ResourceNotFoundException
+        Controller-->>Customer: 404 Not Found
+    end
