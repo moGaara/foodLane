@@ -285,7 +285,7 @@ May provide or validate:
 
 # 5 Feature Priorities
 
-## 8.1 MVP
+##  MVP
 
 The MVP should provide the minimum capability required for a customer to prepare and review an order.
 
@@ -323,6 +323,9 @@ The following use cases represent the current Cart Management scope.
 ---
 
 #  Detailed Use Case — UC-1: Add Item to Cart
+
+<img width="688" height="525" alt="image" src="https://github.com/user-attachments/assets/5e57406f-7a09-47db-867e-2f52e2b41d8c" />
+
 
 ## Basic Information
 
