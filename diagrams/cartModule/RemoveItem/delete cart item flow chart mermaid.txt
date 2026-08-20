@@ -1,0 +1,12 @@
+flowchart TD
+    Start([Start]) --> AuthCheck{Valid JWT Token?}
+
+    AuthCheck -- No --> Auth401[Return 401 Unauthorized]
+
+    AuthCheck -- Yes --> ExtractUser[Extract customerId from JWT Context]
+    ExtractUser --> DBQuery["DELETE FROM cart_item <br/> WHERE cart_item_id = :cartItemId <br/> AND cart_id = (SELECT cart_id FROM cart WHERE customer_id = :customerId)"]
+
+    DBQuery --> CheckAffected{Rows Deleted > 0?}
+
+    CheckAffected -- Yes (1) --> Return200[Return 200 Success]
+    CheckAffected -- No (0) --> Return404[Return 404 Not Found]
