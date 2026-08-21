@@ -449,13 +449,231 @@ Then the customer cannot successfully add the item to the cart
 
 
 ---
+# Sequence Diagram — UC-1 Add Item to Cart
+```mermaid
+
+sequenceDiagram
+    autonumber
+
+    actor Customer
+    participant UI as Client / UI
+    participant Menu as Menu Service
+    participant Cart as Cart Service
+    participant DB as Cart Database
+
+    Customer->>UI: Click "Add Item"
+    Note over Customer,UI: Item configured and required customizations selected
+
+    UI->>Menu: Validate item availability<br/>and required customizations
+
+    alt Required customizations missing
+        Menu-->>UI: Validation failed
+        UI-->>Customer: Show required customization error
+        Note over Cart,DB: Cart remains unchanged
+
+    else Customizations valid
+
+        Menu->>Menu: Check current item availability
+
+        alt Item unavailable
+            Menu-->>UI: Item unavailable
+            UI-->>Customer: Show "Item unavailable"
+            Note over Cart,DB: Do not add item<br/>Existing cart remains unchanged
+
+        else Item available
+            Menu-->>UI: Item available + applicable price
+
+            UI->>Cart: Add item to cart<br/>item + restaurant + customizations + quantity + price
+
+            Cart->>DB: Find active cart for customer
+            DB-->>Cart: Active cart / No active cart
+
+            alt No active cart
+                Cart->>DB: Create active cart for restaurant
+                DB-->>Cart: Active cart created
+
+                Cart->>DB: Check identical Cart Item
+                DB-->>Cart: No identical item
+
+                Cart->>DB: Create Cart Item
+                DB-->>Cart: Cart Item created
+
+            else Active cart exists
+
+                Cart->>DB: Check cart restaurant
+                DB-->>Cart: Existing restaurant ID
+
+                alt Different restaurant
+                    Cart-->>UI: Cart belongs to another restaurant
+                    UI-->>Customer: Ask to replace existing cart
+
+                    alt Customer confirms replacement
+                        Customer->>UI: Confirm replacement
+                        UI->>Cart: Confirm replace cart
+
+                        Cart->>DB: Remove existing cart items
+                        DB-->>Cart: Existing items removed
+
+                        Cart->>DB: Create new Cart Item
+                        DB-->>Cart: Cart Item created
+
+                    else Customer cancels
+                        Customer->>UI: Cancel
+                        UI-->>Customer: Return to previous screen
+                        Note over Cart,DB: Existing cart remains unchanged
+                    end
+
+                else Same restaurant
+
+                    Cart->>DB: Find identical Cart Item
+                    DB-->>Cart: Cart Item / No Cart Item
+
+                    alt Identical Cart Item exists
+                        Cart->>DB: Increase item quantity
+                        DB-->>Cart: Quantity updated
+
+                    else No identical Cart Item
+                        Cart->>DB: Create Cart Item
+                        DB-->>Cart: Cart Item created
+                    end
+                end
+            end
+
+            Cart->>Cart: Recalculate cart totals
+            Cart->>DB: Save updated cart totals
+            DB-->>Cart: Updated cart
+
+            Cart-->>UI: Updated cart
+            UI-->>Customer: Display updated cart
+        end
+    end
+
+```
+---
+# Flow Chart Diagram — UC-1 Add Item to Cart
+```mermaid
+
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0d1117",
+    "primaryColor": "#161b22",
+    "primaryTextColor": "#f0f6fc",
+    "primaryBorderColor": "#30363d",
+    "lineColor": "#8b949e",
+    "secondaryColor": "#161b22",
+    "tertiaryColor": "#161b22",
+    "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "fontSize": "14px"
+  }
+}}%%
+
+flowchart TD
+
+    START([START])
+
+    START --> UI1["Customer configures<br/>menu item"]
+    UI1 --> UI2["Customer clicks<br/>Add Item"]
+
+    UI2 --> MENU1["Menu Service<br/>Validate required customizations"]
+
+    MENU1 --> CUSTOM{"All required<br/>customizations selected?"}
+
+    CUSTOM -->|No| ERROR1["Show validation error"]
+    ERROR1 --> END1([END])
+
+    CUSTOM -->|Yes| MENU2["Menu Service<br/>Check current item availability"]
+
+    MENU2 --> AVAILABLE{"Menu item<br/>available?"}
+
+    AVAILABLE -->|No| ERROR2["Show Item Unavailable"]
+    ERROR2 --> END2([END])
+
+    AVAILABLE -->|Yes| PRICE["Menu Service returns<br/>applicable item price"]
+
+    PRICE --> CART1["Cart Service receives<br/>Add Item request"]
+
+    CART1 --> CART2["Check active cart<br/>for customer"]
+
+    CART2 --> EXISTS{"Active cart<br/>exists?"}
+
+    EXISTS -->|No| CREATE_CART["Create active cart<br/>for selected restaurant"]
+    CREATE_CART --> ITEM_CHECK
+
+    EXISTS -->|Yes| RESTAURANT["Check active cart<br/>restaurant"]
+
+    RESTAURANT --> SAME{"Same restaurant?"}
+
+    SAME -->|No| DIFFERENT["Different restaurant<br/>Inform customer"]
+
+    DIFFERENT --> REPLACE{"Replace existing<br/>cart?"}
+
+    REPLACE -->|No| CANCEL["Cancel operation<br/>Keep existing cart unchanged"]
+    CANCEL --> END3([END])
+
+    REPLACE -->|Yes| CLEAR["Remove existing<br/>cart items"]
+
+    CLEAR --> ADD_NEW["Add selected item<br/>from new restaurant"]
+
+    ADD_NEW --> TOTALS
+
+    SAME -->|Yes| ITEM_CHECK["Check for identical<br/>Cart Item"]
+
+    ITEM_CHECK --> IDENTICAL{"Identical configured<br/>Cart Item exists?"}
+
+    IDENTICAL -->|Yes| INCREASE["Increase existing<br/>Cart Item quantity"]
+
+    IDENTICAL -->|No| CREATE_ITEM["Capture applicable price<br/>Create new Cart Item"]
+
+    INCREASE --> TOTALS
+    CREATE_ITEM --> TOTALS
+
+    TOTALS["Cart Service<br/>Recalculate cart totals"]
+
+    TOTALS --> SAVE["Save updated cart<br/>and cart items"]
+
+    SAVE --> RESPONSE["Return updated cart"]
+
+    RESPONSE --> UI3["Display updated cart<br/>to customer"]
+
+    UI3 --> END4([END])
 
 
+    %% Dark GitHub design
+
+    classDef startEnd fill:#1f2937,stroke:#8b949e,color:#f0f6fc,stroke-width:2px
+
+    classDef ui fill:#172554,stroke:#58a6ff,color:#dbeafe,stroke-width:2px
+
+    classDef menu fill:#2d1f12,stroke:#f0883e,color:#ffdfc4,stroke-width:2px
+
+    classDef cart fill:#251942,stroke:#bc8cff,color:#eadcff,stroke-width:2px
+
+    classDef decision fill:#1c2128,stroke:#8b949e,color:#f0f6fc,stroke-width:2px
+
+    classDef error fill:#3b1618,stroke:#f85149,color:#ffd7d5,stroke-width:2px
+
+    classDef alternate fill:#332a00,stroke:#d29922,color:#ffe8a3,stroke-width:2px
+
+    classDef success fill:#12261a,stroke:#3fb950,color:#aff5b7,stroke-width:2px
 
 
+    class START,END1,END2,END3,END4 startEnd
 
+    class UI1,UI2,UI3 ui
 
+    class MENU1,MENU2,PRICE menu
 
+    class CART1,CART2,CREATE_CART,RESTAURANT,CLEAR,ADD_NEW,ITEM_CHECK,INCREASE,CREATE_ITEM,TOTALS,SAVE,RESPONSE cart
+
+    class CUSTOM,AVAILABLE,EXISTS,SAME,REPLACE,IDENTICAL decision
+
+    class ERROR1,ERROR2,CANCEL error
+
+    class DIFFERENT alternate
+```
+
+---
 
 
 
