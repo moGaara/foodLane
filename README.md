@@ -44,7 +44,7 @@ Delivery
 ---
 
 # ER-Diagram Scratch
-<img width="1060" height="2756" alt="image" src="https://github.com/user-attachments/assets/5e5a0f21-0607-4630-9048-eba9377763df" />
+<img width="1060" height="2756" alt="image" src="https://github.com/user-attachments/assets/e38ad375-6167-413c-b45e-23e84fc0a405" />
 
 ----
 
