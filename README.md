@@ -48,6 +48,11 @@ Delivery
 
 ----
 
+# Cart Management Subsystem ER-Diagram 
+<img width="2741" height="1214" alt="diagram-export-8-21-2026-9_05_08-PM" src="https://github.com/user-attachments/assets/5bbc58f2-e100-4813-8170-371e825cb8db" />
+
+---
+
 # UI / UX Screen Decomposition
 <img width="1451" height="1761" alt="image" src="https://github.com/user-attachments/assets/db058138-fd92-4b8b-a9fa-f179d07fc73d" />
 
