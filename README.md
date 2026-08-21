@@ -43,6 +43,11 @@ Delivery
 
 ---
 
+# ER-Diagram Scratch
+<img width="1060" height="2756" alt="image" src="https://github.com/user-attachments/assets/5e5a0f21-0607-4630-9048-eba9377763df" />
+
+----
+
 # UI / UX Screen Decomposition
 <img width="1451" height="1761" alt="image" src="https://github.com/user-attachments/assets/db058138-fd92-4b8b-a9fa-f179d07fc73d" />
 
