@@ -307,7 +307,7 @@ The MVP should provide the minimum capability required for a customer to prepare
 | Edit customizations | MVP | Customer must manage item choices |
 | Delete item | MVP | Customer must remove unwanted items |
 | View payment summary | MVP | Customer needs to understand payable amount |
-| Apply promo code | MVP / business-dependent | Directly affects final payable amount |
+| Apply promo code | Post-MVP / business-dependent | Directly affects final payable amount |
 | Checkout transition | MVP | Cart must lead to order creation |
 
 
@@ -321,12 +321,12 @@ The following use cases represent the current Cart Management scope.
 
 | ID | Use Case | Status |
 |---|---|---|
-| UC-1 | Add Item to Cart | **Detailed** |
-| UC-2 | Update Cart Item | Later |
-| UC-3 | Delete Cart Item | Later |
-| UC-4 | View Cart | Later |
+| UC-1 | Add Item to Cart | **Done - Hajar** |
+| UC-2 | Update Cart Item | Not-Yet |
+| UC-3 | Delete Cart Item | Not-Yet |
+| UC-4 | View Cart | Not-Yet |
 | UC-5 | Apply Promo Code | Later |
-| UC-6 | View Payment Summary | Later |
+| UC-6 | View Payment Summary | Not-Yet |
 | UC-7 | Add More Items from Same Restaurant | Later |
 | UC-8 | Proceed to Checkout | Later |
 
