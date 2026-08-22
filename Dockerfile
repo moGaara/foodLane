@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Stage 1: Build the application
 # ------------------------------------------------------------------------------
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
 
 WORKDIR /build
 
@@ -16,7 +16,7 @@ RUN mvn package -DskipTests
 # ------------------------------------------------------------------------------
 # Stage 2: Runtime environment
 # ------------------------------------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine AS runner
+FROM eclipse-temurin:17-jre-alpine AS runner
 
 WORKDIR /app
 
