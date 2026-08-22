@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 @Builder
 public class HelloDtoRes {
-    private String name;
+    private long customerID;
+    private String customerName;
 }

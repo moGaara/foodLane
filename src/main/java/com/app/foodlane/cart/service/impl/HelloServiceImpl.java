@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class HelloServiceImpl implements IHelloService {
     @Override
-    public HelloDtoRes helloDto(String name) {
-        return HelloDtoRes.builder().name(name).build();
+    public HelloDtoRes helloDto(String name, long id) {
+        return HelloDtoRes.builder()
+                .customerName(name)
+                .customerID(id)
+                .build();
     }
 }
