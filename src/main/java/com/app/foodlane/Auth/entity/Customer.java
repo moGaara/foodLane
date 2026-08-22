@@ -1,4 +1,4 @@
-package com.app.foodlane.cart.entity;
+package com.app.foodlane.Auth.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

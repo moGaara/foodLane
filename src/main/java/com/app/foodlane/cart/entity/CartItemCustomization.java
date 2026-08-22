@@ -1,5 +1,6 @@
 package com.app.foodlane.cart.entity;
 
+import com.app.foodlane.restaurant.entity.CustomizationOption;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

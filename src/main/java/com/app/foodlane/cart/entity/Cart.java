@@ -1,5 +1,7 @@
 package com.app.foodlane.cart.entity;
 
+import com.app.foodlane.Auth.entity.Customer;
+import com.app.foodlane.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
