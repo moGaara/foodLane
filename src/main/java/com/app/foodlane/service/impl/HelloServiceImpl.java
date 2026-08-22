@@ -1,7 +1,7 @@
-package com.app.foodlane.cart.service.impl;
+package com.app.foodlane.service.impl;
 
-import com.app.foodlane.cart.dto.response.HelloDtoRes;
-import com.app.foodlane.cart.service.IHelloService;
+import com.app.foodlane.dto.response.HelloDtoRes;
+import com.app.foodlane.service.IHelloService;
 import org.springframework.stereotype.Service;
 
 @Service
