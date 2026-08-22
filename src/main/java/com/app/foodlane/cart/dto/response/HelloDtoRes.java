@@ -1,4 +1,4 @@
-package com.app.foodlane.dto.response;
+package com.app.foodlane.cart.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

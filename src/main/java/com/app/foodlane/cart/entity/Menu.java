@@ -1,4 +1,4 @@
-package com.app.foodlane.entity;
+package com.app.foodlane.cart.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

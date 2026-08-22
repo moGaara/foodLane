@@ -1,7 +1,7 @@
-package com.app.foodlane.controller;
+package com.app.foodlane.cart.controller;
 
-import com.app.foodlane.dto.response.HelloDtoRes;
-import com.app.foodlane.service.IHelloService;
+import com.app.foodlane.cart.dto.response.HelloDtoRes;
+import com.app.foodlane.cart.service.IHelloService;
 import com.app.foodlane.utils.CommonFunctions;
 import com.app.foodlane.utils.reswrapper.GenericRes;
 import lombok.RequiredArgsConstructor;

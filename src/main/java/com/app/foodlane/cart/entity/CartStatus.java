@@ -1,4 +1,4 @@
-package com.app.foodlane.entity;
+package com.app.foodlane.cart.entity;
 
 public enum CartStatus {
     ACTIVE,
