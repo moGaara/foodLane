@@ -6,18 +6,21 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "cart", schema = "FoodLand")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
 public class Cart {
 
@@ -40,7 +43,7 @@ public class Cart {
     @Size(max = 30)
     @Builder.Default
     @Column(name = "status", nullable = false, length = 30)
-    private String status = "ACTIVE";
+    private String status = CartStatus.ACTIVE.toString();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -49,4 +52,13 @@ public class Cart {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(
+            mappedBy = "cart",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    List<CartItem> cartItemsList;
 }
