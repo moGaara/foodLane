@@ -140,6 +140,7 @@ CREATE TABLE customization_option
 
     name                    VARCHAR(150)   NOT NULL,
     price                   NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    inventory_quantity      INTEGER        NOT NULL DEFAULT 0,
 
     CONSTRAINT fk_option_group
         FOREIGN KEY (customization_group_id)
