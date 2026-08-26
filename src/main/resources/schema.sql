@@ -119,14 +119,12 @@ CREATE TABLE customization_group
     min_select             INTEGER      NOT NULL DEFAULT 0,
     max_select             INTEGER      NOT NULL DEFAULT 1,
 
-    CONSTRAINT chk_customization_min_select
-        CHECK (min_select >= 0),
-
-    CONSTRAINT chk_customization_max_select
-        CHECK (max_select >= min_select),
-
-    CONSTRAINT chk_customization_max_select_limit
-        CHECK (max_select <= 6)
+   CONSTRAINT chk_customization_required_select
+    CHECK (
+        (required = TRUE  AND min_select = 1 AND max_select = 1)
+        OR
+        (required = FALSE AND min_select = 0)
+    )
 );
 
 
@@ -280,7 +278,7 @@ CREATE TABLE cart_item_customization
         CHECK (price_snapshot >= 0),
 
     CONSTRAINT chk_cic_quantity
-        CHECK (quantity >= 1),
+    CHECK (quantity BETWEEN 1 AND 6),
 
     CONSTRAINT uq_cart_item_option
         UNIQUE (cart_item_id, customization_option_id)
