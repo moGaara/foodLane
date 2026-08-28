@@ -47,7 +47,7 @@ public class CartServiceImpl implements CartService {
         checkCartOwnership(cart,CustomerId);
         checkCartStatus(cart,cartId);
 
-        cartRepository.deleteById(cartId);
+        cartItemRepository.deleteByCart_Id(cartId);
     }
 
     public void checkCartStatus(Cart cart, Long cartId)

@@ -44,7 +44,9 @@ public class CartController {
 
         List<CartItem> cartItemList = cartService.viewCart(cartId, customerId);
 
-        List<CartItemDto> cartItemDtos =  cartItemList.stream().map(this::buildCartItemDto).toList();
+        List<CartItemDto> cartItemDtos =  cartItemList.stream()
+                .map(cartItem -> buildCartItemDto(cartItem, cartId))
+                .toList();
         GenericRes<List<CartItemDto>> res = new GenericRes<>();
         res.setBody(cartItemDtos);
 
@@ -63,11 +65,10 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    private CartItemDto buildCartItemDto(CartItem cartItem) {
+    private CartItemDto buildCartItemDto(CartItem cartItem, Long  cartId) {
         return CartItemDto.builder()
                 .cartItemId(cartItem.getCartItemId())
-                .cartId(cartItem.getCart().getCartId())
-                .menuItemId(cartItem.getMenuItem().getMenuItemId())
+                .cartId(cartId)
                 .quantity(cartItem.getQuantity())
                 .unitPriceSnapshot(cartItem.getUnitPriceSnapshot())
                 .itemNote(cartItem.getItemNote())
