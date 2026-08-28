@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "customization_option", schema = "FoodLand", uniqueConstraints = {
+@Table(name = "customization_option", schema = "foodland", uniqueConstraints = {
         @UniqueConstraint(name = "uq_option_group_name", columnNames = {"customization_group_id", "name"})
 })
 @Getter
@@ -40,4 +40,10 @@ public class CustomizationOption {
     @Builder.Default
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
+
+    @NotNull
+    @PositiveOrZero(message = "Inventory selected cannot be negative")
+    @Builder.Default
+    @Column(name = "inventory_quantity", nullable = false)
+    private Integer inventoryQuantity = 0;
 }

@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "cart_item_customization", schema = "FoodLand", uniqueConstraints = {
+@Table(name = "cart_item_customization", schema = "foodland", uniqueConstraints = {
         @UniqueConstraint(name = "uq_cart_item_option", columnNames = {"cart_item_id", "customization_option_id"})
 })
 @Getter
@@ -44,6 +44,6 @@ public class CartItemCustomization {
     @NotNull
     @Min(value = 1, message = "Quantity must be at least 1")
     @Builder.Default
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity = 1;
+    @Column(name = "selected", nullable = false)
+    private Integer selected = 1;
 }

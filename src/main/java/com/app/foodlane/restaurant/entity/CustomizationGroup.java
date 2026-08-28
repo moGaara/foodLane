@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "customization_group", schema = "FoodLand")
+@Table(name = "customization_group", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,6 +43,6 @@ public class CustomizationGroup {
     @Column(name = "max_select", nullable = false)
     private Integer maxSelect = 1;
 
-    @OneToMany
+    @OneToMany(mappedBy = "customizationGroup")
     List<CustomizationOption> customizationOptions;
 }

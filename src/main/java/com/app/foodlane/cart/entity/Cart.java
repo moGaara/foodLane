@@ -14,10 +14,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "cart", schema = "FoodLand")
+@Table(name = "cart", schema = "foodland")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -60,5 +61,5 @@ public class Cart {
             fetch = FetchType.LAZY
     )
     @Builder.Default
-    List<CartItem> cartItemsList;
+    List<CartItem> cartItemsList = new ArrayList<>();
 }
