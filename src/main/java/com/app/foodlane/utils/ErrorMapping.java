@@ -12,6 +12,7 @@ public enum ErrorMapping {
     REQUIRED_CART_ITEM_ID(ErrorConstants.REQUIRED_CART_ITEM_ID_CODE, ErrorConstants.REQUIRED_CART_ITEM_ID_DESC),
     INVALID_CART_ITEM_ID(ErrorConstants.INVALID_CART_ITEM_ID_CODE, ErrorConstants.INVALID_CART_ITEM_ID_DESC),
     SOMETHING_WENT_WRONG(ErrorConstants.DEFAULT_ERROR_CODE, ErrorConstants.DEFAULT_ERROR_DESC),
+    CART_ITEM_NOT_EXIST(ErrorConstants.CART_ITEM_NOT_EXIST_CODE, ErrorConstants.CART_ITEM_NOT_EXIST_DESC),
     SUCCESS(ErrorConstants.SUCCESS_CODE, ErrorConstants.SUCCESS_DESC);
 
     private final String code;

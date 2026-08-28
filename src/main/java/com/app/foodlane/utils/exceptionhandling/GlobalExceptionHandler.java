@@ -42,6 +42,15 @@ public class GlobalExceptionHandler {
                         .statusDesc(error.getDesc())
                         .build());
     }
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ResHeader> handleBusinessException(BusinessException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ResHeader.builder()
+                        .statusCode(ex.getCode())
+                        .statusDesc(ex.getDesc())
+                        .build());
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResHeader> handleUnexpectedExceptions(Exception ex) {
         ErrorMapping error = ErrorMapping.getErrorByCode(ErrorConstants.DEFAULT_ERROR_CODE);

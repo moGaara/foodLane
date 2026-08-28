@@ -3,6 +3,8 @@ package com.app.foodlane.cart.service.impl;
 import com.app.foodlane.cart.entity.CartStatus;
 import com.app.foodlane.cart.repository.CartItemRepository;
 import com.app.foodlane.cart.service.IDeleteCartItemService;
+import com.app.foodlane.utils.ErrorMapping;
+import com.app.foodlane.utils.exceptionhandling.BusinessException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ public class DeleteCartItemServiceImpl implements IDeleteCartItemService {
     public void deleteItem(Long customerId, Long itemId) {
         int deletedRows = repo.deleteByCartItemIdAndCustomerId(itemId, customerId, CartStatus.ACTIVE.name());
         if (deletedRows == 0) {
-            throw new IllegalArgumentException("Cart item not found or unauthorized access.");
+            throw new BusinessException(ErrorMapping.CART_ITEM_NOT_EXIST);
         }
     }
 }
