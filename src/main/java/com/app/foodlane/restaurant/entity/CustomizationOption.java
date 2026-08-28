@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "customization_option", schema = "FoodLand", uniqueConstraints = {
+@Table(name = "customization_option", schema = "foodland", uniqueConstraints = {
         @UniqueConstraint(name = "uq_option_group_name", columnNames = {"customization_group_id", "name"})
 })
 @Getter

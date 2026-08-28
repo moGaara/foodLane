@@ -1,7 +1,10 @@
 -- ============================================================
 -- TALABAT CART MANAGEMENT SYSTEM
 
-create schema FoodLand;
+create schema foodland;
+
+-- Set search_path so all following statements execute within foodland
+SET search_path TO foodland;
 
 -- ============================================================
 

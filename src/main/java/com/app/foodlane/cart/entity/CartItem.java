@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_item", schema = "FoodLand")
+@Table(name = "cart_item", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor

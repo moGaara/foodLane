@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
-@Table(name = "customization_group", schema = "FoodLand")
+@Table(name = "customization_group", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor
