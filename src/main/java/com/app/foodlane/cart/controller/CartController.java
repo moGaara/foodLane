@@ -1,6 +1,9 @@
 package com.app.foodlane.cart.controller;
 
+import com.app.foodlane.cart.dto.response.CartItemDto;
 import com.app.foodlane.cart.dto.response.HelloDtoRes;
+import com.app.foodlane.cart.entity.CartItem;
+import com.app.foodlane.cart.service.CartService;
 import com.app.foodlane.cart.service.IHelloService;
 import com.app.foodlane.utils.CommonFunctions;
 import com.app.foodlane.utils.reswrapper.GenericRes;
@@ -8,11 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class CartController {
     private final IHelloService iHelloService;
+    private final CartService cartService;
 
     @GetMapping("/hello")
     public ResponseEntity<GenericRes<Void>> hello(){
@@ -28,4 +34,44 @@ public class CartController {
         res.setBody(serviceRes);
         return ResponseEntity.ok(res);
     }
+
+
+
+    @GetMapping("/cart/{cartId}")
+    public ResponseEntity<GenericRes<List<CartItemDto>>> viewCart(@PathVariable Long cartId,  @RequestHeader("Authorization") String authorization ){
+
+        long customerId = CommonFunctions.extractID(authorization);
+
+        List<CartItem> cartItemList = cartService.viewCart(cartId, customerId);
+
+        List<CartItemDto> cartItemDtos =  cartItemList.stream().map(this::buildCartItemDto).toList();
+        GenericRes<List<CartItemDto>> res = new GenericRes<>();
+        res.setBody(cartItemDtos);
+
+        return ResponseEntity.ok(res);
+    }
+
+    @DeleteMapping("/cart/{cartId}")
+    public ResponseEntity<GenericRes<Void>> clearCart(
+            @PathVariable Long cartId,
+            @RequestHeader("Authorization") String authorization) {
+        long customerId = CommonFunctions.extractID(authorization);
+        cartService.clearCart(cartId, customerId);
+
+        GenericRes<Void> response = new GenericRes<>();
+
+        return ResponseEntity.ok(response);
+    }
+
+    private CartItemDto buildCartItemDto(CartItem cartItem) {
+        return CartItemDto.builder()
+                .cartItemId(cartItem.getCartItemId())
+                .cartId(cartItem.getCart().getCartId())
+                .menuItemId(cartItem.getMenuItem().getMenuItemId())
+                .quantity(cartItem.getQuantity())
+                .unitPriceSnapshot(cartItem.getUnitPriceSnapshot())
+                .itemNote(cartItem.getItemNote())
+                .build();
+    }
+
 }
