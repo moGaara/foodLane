@@ -34,9 +34,7 @@ public class CartController {
         return ResponseEntity.ok(res);
     }
     @DeleteMapping("/cart-item/{cartItemId}")
-    public ResponseEntity<GenericRes<Void>> removeCartItem(@PathVariable
-                                                               @NotNull(message = ErrorConstants.REQUIRED_CART_ITEM_ID_CODE)
-                                                               @Positive(message = ErrorConstants.INVALID_CART_ITEM_ID_CODE) Long cartItemId,
+    public ResponseEntity<GenericRes<Void>> removeCartItem(@PathVariable @Positive(message = ErrorConstants.INVALID_CART_ITEM_ID_CODE) long cartItemId,
                                                              @RequestHeader("Authorization") String authorization){
 
         long customerId = CommonFunctions.extractID(authorization);
