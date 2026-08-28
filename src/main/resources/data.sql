@@ -1,5 +1,4 @@
-SET
-search_path TO "FoodLand", public;
+SET search_path TO foodlane, public;
 
 -- 1. CUSTOMER
 INSERT INTO customer (name, email)
@@ -79,4 +78,3 @@ INSERT INTO cart_item_customization (cart_item_id, customization_option_id, pric
 VALUES (1, 1, 0.00, 1), -- Selected Cheddar for Cheeseburger
        (1, 3, 2.00, 1), -- Selected Extra Bacon for Cheeseburger
        (3, 7, 2.50, 1); -- Selected Stuffed Crust for Pizza
-

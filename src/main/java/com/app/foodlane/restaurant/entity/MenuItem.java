@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "menu_item", schema = "FoodLand")
+@Table(name = "menu_item", schema = "foodlane")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -55,7 +55,7 @@ public class MenuItem {
     @ManyToMany
     @JoinTable(
             name = "menu_item_customization_group",
-            schema = "FoodLand",
+            schema = "foodlane",
             joinColumns = @JoinColumn(name = "menu_item_id"),
             inverseJoinColumns = @JoinColumn(name = "customization_group_id")
     )

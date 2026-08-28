@@ -1,7 +1,8 @@
 -- ============================================================
 -- TALABAT CART MANAGEMENT SYSTEM
 
-create schema FoodLand;
+CREATE SCHEMA IF NOT EXISTS foodlane;
+SET search_path TO foodlane, public;
 
 -- ============================================================
 
@@ -284,4 +285,3 @@ CREATE TABLE cart_item_customization
     CONSTRAINT uq_cart_item_option
         UNIQUE (cart_item_id, customization_option_id)
 );
-

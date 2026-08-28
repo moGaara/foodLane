@@ -2,57 +2,41 @@
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Customer selects item in active cart]
-    B --> C[Submit cart item update]
-    C --> D{Cart exists?}
-
-    D -->|No| E[Return 404 Cart Not Found]
-    D -->|Yes| F{Cart belongs to customer?}
-
-    F -->|No| G[Return authorization error]
-    F -->|Yes| H{Cart editable?}
-
-    H -->|No| I[Return Cart Not Editable error]
-    H -->|Yes| J{Cart item exists?}
-
-    J -->|No| K[Return 404 Cart Item Not Found]
-    J -->|Yes| L{Quantity valid?}
-
-    L -->|No| M[Return validation error]
-    L -->|Yes| N{Item available?}
-
-    N -->|No| O[Return Item Unavailable error]
-    N -->|Yes| P{Requested quantity available?}
-
-    P -->|No| Q[Return Insufficient Availability error]
-    P -->|Yes| R{Customization valid?}
-
-    R -->|No| S[Return Customization validation error]
-    R -->|Yes| T[Update Cart Item]
-
-    T --> U[Recalculate cart subtotal and total]
-    U --> V{Persist update successful?}
-
-    V -->|No| W[Rollback / keep previous cart state]
-    W --> X[Return server error]
-
-    V -->|Yes| Y[Return updated cart]
-    Y --> Z([End])
-
-    E --> Z
-    G --> Z
-    I --> Z
-    K --> Z
-    M --> Z
-    O --> Z
-    Q --> Z
-    S --> Z
-    X --> Z
+    A([PATCH cart-item request]) --> B{Authorization header present?}
+    B -->|No| C[Return 400]
+    B -->|Yes| D[Extract customerID]
+    D --> E{At least one valid editable field?}
+    E -->|No| F[Return 400 validation error]
+    E -->|Yes| G[Find item by item ID, cart ID, customer ID and ACTIVE status]
+    G --> H{Item found?}
+    H -->|No| I[Raise CartItemNotFoundException]
+    H -->|Yes| J{Quantity equals 0?}
+    J -->|Yes| K[Delete cart item and flush]
+    J -->|No| L{Provided quantity within inventory?}
+    L -->|No| M[Raise insufficient inventory error]
+    L -->|Yes| N[Update provided quantity and note]
+    N --> T{Customizations provided?}
+    T -->|Yes| U[Validate and replace customizations]
+    T -->|No| O
+    U --> O
+    K --> O[Load remaining cart items]
+    O --> P[Map items and calculate item totals]
+    P --> Q[Calculate cart total]
+    Q --> R[Return 200 with updated cart]
+    R --> S([End])
+    C --> S
+    F --> S
+    I --> S
+    M --> S
 ```
 
 ## Flow Notes
 
-- **Quantity = 0** is rejected here. The existing Remove Item use case should be used to remove an item.
-- Availability is checked before persisting an increased quantity.
-- The cart is recalculated only after validation succeeds.
-- Persistence failure must not leave a partially updated cart.
+- Quantity `0` deletes the item; it is never saved as a database quantity.
+- Quantities `1–99` update the item after inventory validation.
+- Omitted fields remain unchanged.
+- Provided customizations replace previous selections after option and group validation.
+- A customization with quantity `0` is removed instead of being stored.
+- The repository lookup enforces cart ownership and `ACTIVE` status.
+- The returned cart excludes a deleted item and includes recalculated totals.
+- The operation runs in one transaction.
