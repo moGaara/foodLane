@@ -2,7 +2,6 @@ package com.app.foodlane.cart.controller;
 
 import com.app.foodlane.cart.dto.request.AddToCartRequestDto;
 import com.app.foodlane.cart.dto.response.CartResponseDto;
-import com.app.foodlane.cart.service.IHelloService;
 import com.app.foodlane.cart.service.CartService;
 import com.app.foodlane.cart.service.IDeleteCartItemService;
 import com.app.foodlane.utils.CommonFunctions;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
 public class CartController {
-    private final IHelloService iHelloService;
+    private final IDeleteCartItemService iDeleteCartItemService;
     private final CartService cartService;
 
     @DeleteMapping("/cart-item/{cartItemId}")
