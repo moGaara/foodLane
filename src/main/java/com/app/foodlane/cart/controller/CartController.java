@@ -4,7 +4,10 @@ import com.app.foodlane.cart.dto.response.HelloDtoRes;
 import com.app.foodlane.cart.service.IDeleteCartItemService;
 import com.app.foodlane.cart.service.IHelloService;
 import com.app.foodlane.utils.CommonFunctions;
+import com.app.foodlane.utils.ErrorConstants;
 import com.app.foodlane.utils.reswrapper.GenericRes;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +34,11 @@ public class CartController {
         return ResponseEntity.ok(res);
     }
     @DeleteMapping("/cart-item/{cartItemId}")
-    public ResponseEntity<GenericRes<Void>> removeCartItem(@PathVariable Long cartItemId,
+    public ResponseEntity<GenericRes<Void>> removeCartItem(@PathVariable
+                                                               @NotNull(message = ErrorConstants.REQUIRED_CART_ITEM_ID_CODE)
+                                                               @Positive(message = ErrorConstants.INVALID_CART_ITEM_ID_CODE) Long cartItemId,
                                                              @RequestHeader("Authorization") String authorization){
+
         long customerId = CommonFunctions.extractID(authorization);
         iDeleteCartItemService.deleteItem(customerId, cartItemId);
         GenericRes<Void> res = new GenericRes<>();
