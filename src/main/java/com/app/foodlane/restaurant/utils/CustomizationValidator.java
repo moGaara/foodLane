@@ -30,6 +30,7 @@ public class CustomizationValidator {
         Map<CustomizationGroup, List<CustomizationSelectionDto>> selectionsByGroup = new HashMap<>();
 
         for (CustomizationSelectionDto selection : safeSelections) {
+            // check if incoming selectedCustomization is existed in availableOptionsMap
             CustomizationOption option = availableOptionsMap.get(selection.customizationOptionId());
 
             // Check 1: Ensure the option belongs to this menu item.
@@ -43,7 +44,7 @@ public class CustomizationValidator {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                         "Customization option '" + option.getName() + "' is out of stock");
             }
-
+            // selected group with its selected customization
             selectionsByGroup.computeIfAbsent(option.getCustomizationGroup(), k -> new ArrayList<>()).add(selection);
         }
 
