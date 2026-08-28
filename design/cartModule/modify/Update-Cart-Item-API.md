@@ -141,7 +141,7 @@ Example:
 ```json
 {
   "code": "INSUFFICIENT_AVAILABILITY",
-  "message": "The requested quantity is not currently available."
+  "message": "The requested selected is not currently available."
 }
 ```
 

@@ -44,6 +44,6 @@ public class CartItemCustomization {
     @NotNull
     @Min(value = 1, message = "Quantity must be at least 1")
     @Builder.Default
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity = 1;
+    @Column(name = "selected", nullable = false)
+    private Integer selected = 1;
 }
