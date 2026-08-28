@@ -7,7 +7,8 @@ sequenceDiagram
     participant Controller as CartController
     participant Service as CartServiceImpl
     participant Repository as CartItemRepository
-    participant DB as PostgreSQL foodlane schema
+    participant Mapper as shared CartMapper
+    participant DB as PostgreSQL foodland schema
 
     Customer->>Client: Edit quantity, note, and/or customizations
     Client->>Controller: PATCH /api/v1/carts/{cartId}/items/{cartItemId}
@@ -20,31 +21,35 @@ sequenceDiagram
     Repository-->>Service: Optional CartItem
 
     alt Cart item not found
-        Service-->>Controller: CartItemNotFoundException
-        Controller-->>Client: Error response
+        Service-->>Controller: BusinessException E000004
+        Controller-->>Client: Mapped 400 response
     else Quantity equals 0
         Service->>Repository: delete(cartItem) and flush
         Repository->>DB: DELETE cart_item
         Note over DB: Customizations deleted by ON DELETE CASCADE
-        Service->>Repository: findAllByCartCartId(cartId)
+        Service->>Mapper: toCartResponse(cart)
+        Mapper->>Repository: findAllByCartCartId(cartId)
         Repository->>DB: SELECT remaining items
-        DB-->>Service: Remaining items
-        Service->>Service: Map items and recalculate total
+        DB-->>Mapper: Remaining items
+        Mapper->>Mapper: Map responses and recalculate total
+        Mapper-->>Service: Updated CartResponse
         Service-->>Controller: Updated CartResponse
         Controller-->>Client: 200 OK and GenericRes CartResponse
     else Quantity between 1 and 99
         Service->>Service: Validate menu-item inventory
         alt Quantity exceeds inventory
-            Service-->>Controller: IllegalArgumentException
-            Controller-->>Client: Error response
+            Service-->>Controller: BusinessException E000006
+            Controller-->>Client: Mapped 400 response
         else Inventory available
             Service->>Service: Apply provided note and validate customizations
             Service->>Repository: Replace provided customizations and save CartItem
             Repository->>DB: UPDATE cart_item quantity
-            Service->>Repository: findAllByCartCartId(cartId)
+            Service->>Mapper: toCartResponse(cart)
+            Mapper->>Repository: findAllByCartCartId(cartId)
             Repository->>DB: SELECT cart items
-            DB-->>Service: Updated items
-            Service->>Service: Map items and recalculate total
+            DB-->>Mapper: Updated items
+            Mapper->>Mapper: Map responses and recalculate total
+            Mapper-->>Service: Updated CartResponse
             Service-->>Controller: Updated CartResponse
             Controller-->>Client: 200 OK and GenericRes CartResponse
         end
@@ -58,7 +63,9 @@ sequenceDiagram
 1. Ownership is enforced by the repository lookup before modification.
 2. Quantity `0` follows the delete branch before inventory validation.
 3. Quantities `1–99` are checked against inventory before saving.
-4. The service reloads remaining items and returns the entire updated cart.
+4. The shared mapper reloads remaining items and returns the entire updated cart.
 5. The transaction rolls back if persistence fails.
 6. Omitted request fields remain unchanged; provided customizations replace existing selections.
 7. Customization quantity `0` removes that option before the replacement list is saved.
+8. An empty customization list removes all selections only when all linked groups are optional.
+9. `GlobalExceptionHandler` maps update business errors through `ErrorMapping`.

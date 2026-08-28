@@ -3,11 +3,37 @@ package com.app.foodlane.utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 @AllArgsConstructor
 public enum ErrorMapping {
-    SUCCESS("I000000", "Success");
+    REQUIRED_CART_ITEM_ID(ErrorConstants.REQUIRED_CART_ITEM_ID_CODE, ErrorConstants.REQUIRED_CART_ITEM_ID_DESC),
+    INVALID_CART_ITEM_ID(ErrorConstants.INVALID_CART_ITEM_ID_CODE, ErrorConstants.INVALID_CART_ITEM_ID_DESC),
+    SOMETHING_WENT_WRONG(ErrorConstants.DEFAULT_ERROR_CODE, ErrorConstants.DEFAULT_ERROR_DESC),
+    CART_ITEM_NOT_EXIST(ErrorConstants.CART_ITEM_NOT_EXIST_CODE, ErrorConstants.CART_ITEM_NOT_EXIST_DESC),
+    INVALID_CART_UPDATE(ErrorConstants.INVALID_CART_UPDATE_CODE, ErrorConstants.INVALID_CART_UPDATE_DESC),
+    INSUFFICIENT_INVENTORY(ErrorConstants.INSUFFICIENT_INVENTORY_CODE, ErrorConstants.INSUFFICIENT_INVENTORY_DESC),
+    DUPLICATE_CUSTOMIZATION(ErrorConstants.DUPLICATE_CUSTOMIZATION_CODE, ErrorConstants.DUPLICATE_CUSTOMIZATION_DESC),
+    CUSTOMIZATION_NOT_EXIST(ErrorConstants.CUSTOMIZATION_NOT_EXIST_CODE, ErrorConstants.CUSTOMIZATION_NOT_EXIST_DESC),
+    CUSTOMIZATION_NOT_ALLOWED(ErrorConstants.CUSTOMIZATION_NOT_ALLOWED_CODE, ErrorConstants.CUSTOMIZATION_NOT_ALLOWED_DESC),
+    INVALID_CUSTOMIZATION_SELECTION(ErrorConstants.INVALID_CUSTOMIZATION_SELECTION_CODE, ErrorConstants.INVALID_CUSTOMIZATION_SELECTION_DESC),
+    SUCCESS(ErrorConstants.SUCCESS_CODE, ErrorConstants.SUCCESS_DESC);
 
     private final String code;
     private final String desc;
+
+    // Static HashMap for O(1) resolution from error code to ErrorMapping enum
+    private static final Map<String, ErrorMapping> CODE_MAP = new HashMap<>();
+    static {
+        for (ErrorMapping error : values()) {
+            CODE_MAP.put(error.getCode(), error);
+        }
+    }
+
+    // O(1) lookup method
+    public static ErrorMapping getErrorByCode(String code) {
+        return CODE_MAP.getOrDefault(code, SOMETHING_WENT_WRONG);
+    }
 }

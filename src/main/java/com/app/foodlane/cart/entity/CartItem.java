@@ -12,9 +12,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "cart_item", schema = "foodlane")
+@Table(name = "cart_item", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -58,4 +60,13 @@ public class CartItem {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(
+            mappedBy = "cartItem",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    List<CartItemCustomization> cartItemCustomizations = new ArrayList<>();
 }

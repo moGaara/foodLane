@@ -12,6 +12,7 @@ public class CartItemResponse {
     private Long cartId;
     private Long cartItemId;
     private Long menuItemId;
+    private String menuItemName;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

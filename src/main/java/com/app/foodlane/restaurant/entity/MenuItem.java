@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "menu_item", schema = "foodlane")
+@Table(name = "menu_item", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,7 +47,7 @@ public class MenuItem {
     private String imageUrl;
 
     @NotNull
-    @PositiveOrZero(message = "Inventory quantity cannot be negative")
+    @PositiveOrZero(message = "Inventory selected cannot be negative")
     @Builder.Default
     @Column(name = "inventory_quantity", nullable = false)
     private Integer inventoryQuantity = 0;
@@ -55,7 +55,7 @@ public class MenuItem {
     @ManyToMany
     @JoinTable(
             name = "menu_item_customization_group",
-            schema = "foodlane",
+            schema = "foodland",
             joinColumns = @JoinColumn(name = "menu_item_id"),
             inverseJoinColumns = @JoinColumn(name = "customization_group_id")
     )

@@ -11,9 +11,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "cart", schema = "foodlane")
+@Table(name = "cart", schema = "foodland")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,7 +42,7 @@ public class Cart {
     @Size(max = 30)
     @Builder.Default
     @Column(name = "status", nullable = false, length = 30)
-    private String status = "ACTIVE";
+    private String status = CartStatus.ACTIVE.toString();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -49,4 +51,13 @@ public class Cart {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(
+            mappedBy = "cart",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    List<CartItem> cartItemsList = new ArrayList<>();
 }

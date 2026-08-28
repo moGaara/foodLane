@@ -1,4 +1,4 @@
-SET search_path TO foodlane, public;
+SET search_path TO foodland;
 
 -- 1. CUSTOMER
 INSERT INTO customer (name, email)

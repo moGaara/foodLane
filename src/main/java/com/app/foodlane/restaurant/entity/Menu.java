@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
-@Table(name = "menu", schema = "foodlane", uniqueConstraints = {
+@Table(name = "menu", schema = "foodland", uniqueConstraints = {
         @UniqueConstraint(name = "uq_menu_restaurant", columnNames = {"menu_id", "restaurant_id"})
 })
 @Getter

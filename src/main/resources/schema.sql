@@ -1,8 +1,10 @@
 -- ============================================================
 -- TALABAT CART MANAGEMENT SYSTEM
 
-CREATE SCHEMA IF NOT EXISTS foodlane;
-SET search_path TO foodlane, public;
+create schema foodland;
+
+-- Set search_path so all following statements execute within foodland
+SET search_path TO foodland;
 
 -- ============================================================
 
@@ -17,7 +19,6 @@ CREATE TABLE customer
     email       VARCHAR(255) NOT NULL UNIQUE,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- ============================================================
 -- 2. RESTAURANT

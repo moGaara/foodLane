@@ -1,6 +1,5 @@
 package com.app.foodlane.cart.service.impl;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,19 +12,19 @@ import org.springframework.stereotype.Service;
 
 import com.app.foodlane.cart.dto.request.CartItemCustomizationRequest;
 import com.app.foodlane.cart.dto.request.UpdateCartItemRequest;
-import com.app.foodlane.cart.dto.response.CartItemCustomizationResponse;
-import com.app.foodlane.cart.dto.response.CartItemResponse;
 import com.app.foodlane.cart.dto.response.CartResponse;
 import com.app.foodlane.cart.entity.Cart;
 import com.app.foodlane.cart.entity.CartItem;
 import com.app.foodlane.cart.entity.CartItemCustomization;
-import com.app.foodlane.cart.exceptionhandling.CartItemNotFoundException;
+import com.app.foodlane.cart.mapper.CartMapper;
 import com.app.foodlane.cart.repository.CartItemCustomizationRepository;
 import com.app.foodlane.cart.repository.CartItemRepository;
 import com.app.foodlane.cart.repository.CustomizationOptionRepository;
-import com.app.foodlane.cart.service.CartService;
+import com.app.foodlane.cart.service.UpdateCartService;
 import com.app.foodlane.restaurant.entity.CustomizationGroup;
 import com.app.foodlane.restaurant.entity.CustomizationOption;
+import com.app.foodlane.utils.ErrorMapping;
+import com.app.foodlane.utils.exceptionhandling.BusinessException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CartServiceImpl implements CartService {
+public class CartServiceImpl implements UpdateCartService {
     private final CartItemRepository cartItemRepository;
     private final CartItemCustomizationRepository cartItemCustomizationRepository;
     private final CustomizationOptionRepository customizationOptionRepository;
+    private final CartMapper cartMapper;
     /**
      * Applies PATCH semantics to quantity, note, and customizations.
      */
@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem = cartItemRepository
                 .findByCartItemIdAndCartCartIdAndCartCustomerCustomerIdAndCartStatus(
                         cartItemId, cartId, customerId, "ACTIVE")
-                .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
+                .orElseThrow(() -> new BusinessException(ErrorMapping.CART_ITEM_NOT_EXIST));
 
         Cart cart = cartItem.getCart();
 
@@ -64,7 +64,7 @@ public class CartServiceImpl implements CartService {
             cartItemRepository.delete(cartItem);
             cartItemRepository.flush();
             log.info("Cart item deleted: cartId={}, cartItemId={}", cartId, cartItemId);
-            return buildCartResponse(cart);
+            return cartMapper.toCartResponse(cart);
         }
 
         if (request.getQuantity() != null) {
@@ -83,7 +83,7 @@ public class CartServiceImpl implements CartService {
         cartItemRepository.save(cartItem);
         log.info("Cart item updated: cartId={}, cartItemId={}, quantity={}",
                 cartId, cartItemId, cartItem.getQuantity());
-        return buildCartResponse(cart);
+        return cartMapper.toCartResponse(cart);
     }
 
     private void validateInventory(CartItem cartItem, Integer quantity) {
@@ -91,7 +91,7 @@ public class CartServiceImpl implements CartService {
             log.warn("Rejected unavailable quantity: cartItemId={}, requested={}, available={}",
                     cartItem.getCartItemId(), quantity,
                     cartItem.getMenuItem().getInventoryQuantity());
-            throw new IllegalArgumentException("Requested quantity exceeds the available inventory");
+            throw new BusinessException(ErrorMapping.INSUFFICIENT_INVENTORY);
         }
     }
 
@@ -106,7 +106,7 @@ public class CartServiceImpl implements CartService {
 
         if (requestedOptionIds.size() != requests.size()) {
             log.warn("Rejected duplicate customizations: cartItemId={}", cartItem.getCartItemId());
-            throw new IllegalArgumentException("Duplicate customization options are not allowed");
+            throw new BusinessException(ErrorMapping.DUPLICATE_CUSTOMIZATION);
         }
 
         Map<Long, CustomizationOption> options = customizationOptionRepository
@@ -119,7 +119,7 @@ public class CartServiceImpl implements CartService {
         if (options.size() != requestedOptionIds.size()) {
             log.warn("Rejected unknown customization option: cartItemId={}",
                     cartItem.getCartItemId());
-            throw new IllegalArgumentException("One or more customization options do not exist");
+            throw new BusinessException(ErrorMapping.CUSTOMIZATION_NOT_EXIST);
         }
 
         // Only groups assigned to the selected menu item may be used.
@@ -142,9 +142,7 @@ public class CartServiceImpl implements CartService {
             if (!allowedGroups.containsKey(groupId)) {
                 log.warn("Rejected unavailable customization: cartItemId={}, optionId={}",
                         cartItem.getCartItemId(), option.getCustomizationOptionId());
-                throw new IllegalArgumentException(
-                        "Customization option is not available for this menu item: "
-                                + option.getCustomizationOptionId());
+                throw new BusinessException(ErrorMapping.CUSTOMIZATION_NOT_ALLOWED);
             }
             selectionsPerGroup.merge(groupId, 1, Integer::sum);
         }
@@ -157,8 +155,7 @@ public class CartServiceImpl implements CartService {
                         "Rejected customization count: cartItemId={}, groupId={}, selected={}, min={}, max={}",
                         cartItem.getCartItemId(), group.getCustomizationGroupId(), selected,
                         group.getMinSelect(), group.getMaxSelect());
-                throw new IllegalArgumentException(
-                        "Invalid number of selections for customization group: " + group.getName());
+                throw new BusinessException(ErrorMapping.INVALID_CUSTOMIZATION_SELECTION);
             }
         }
 
@@ -184,65 +181,4 @@ public class CartServiceImpl implements CartService {
                 cartItem.getCartItemId(), replacements.size());
     }
 
-    private CartResponse buildCartResponse(Cart cart) {
-        List<CartItemResponse> items = cartItemRepository.findAllByCartCartId(cart.getCartId())
-                .stream()
-                .map(this::toCartItemResponse)
-                .toList();
-
-        BigDecimal totalPrice = items.stream()
-                .map(CartItemResponse::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return CartResponse.builder()
-                .cartId(cart.getCartId())
-                .customerId(cart.getCustomer().getCustomerId())
-                .restaurantId(cart.getRestaurant().getRestaurantId())
-                .items(items)
-                .totalPrice(totalPrice)
-                .build();
-    }
-
-    private CartItemResponse toCartItemResponse(CartItem cartItem) {
-        List<CartItemCustomizationResponse> customizations = cartItemCustomizationRepository
-                .findAllByCartItemCartItemId(cartItem.getCartItemId())
-                .stream()
-                .map(this::toCustomizationResponse)
-                .toList();
-
-        // Customization totals are per item unit, then multiplied by cart-item quantity.
-        BigDecimal customizationUnitTotal = customizations.stream()
-                .map(CartItemCustomizationResponse::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal totalPrice = cartItem.getUnitPriceSnapshot()
-                .add(customizationUnitTotal)
-                .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-
-        return CartItemResponse.builder()
-                .cartId(cartItem.getCart().getCartId())
-                .cartItemId(cartItem.getCartItemId())
-                .menuItemId(cartItem.getMenuItem().getMenuItemId())
-                .quantity(cartItem.getQuantity())
-                .unitPrice(cartItem.getUnitPriceSnapshot())
-                .totalPrice(totalPrice)
-                .itemNote(cartItem.getItemNote())
-                .customizations(customizations)
-                .build();
-    }
-
-    private CartItemCustomizationResponse toCustomizationResponse(
-            CartItemCustomization customization) {
-        BigDecimal totalPrice = customization.getPriceSnapshot()
-                .multiply(BigDecimal.valueOf(customization.getQuantity()));
-
-        return CartItemCustomizationResponse.builder()
-                .customizationOptionId(
-                        customization.getCustomizationOption().getCustomizationOptionId())
-                .name(customization.getCustomizationOption().getName())
-                .quantity(customization.getQuantity())
-                .unitPrice(customization.getPriceSnapshot())
-                .totalPrice(totalPrice)
-                .build();
-    }
 }

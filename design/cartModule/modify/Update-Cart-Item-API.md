@@ -91,12 +91,16 @@ For quantity `0`, the deleted item is absent from `items` and `totalPrice` is re
 | Condition | Current result |
 |---|---|
 | Missing authorization header | `400 Bad Request` |
-| Missing, negative, or greater-than-99 quantity | `400 Bad Request` |
-| Cart item does not match cart/customer/active status | Exception currently surfaces as `500` until global exception handling is added |
-| Quantity exceeds inventory | Exception currently surfaces as `500` until global exception handling is added |
+| Invalid body, negative/greater-than-99 quantity, oversized note, or no editable field | `400`, `E000005` |
+| Cart item does not match cart/customer/active status | `400`, `E000004` |
+| Quantity exceeds inventory | `400`, `E000006` |
+| Duplicate customization options | `400`, `E000007` |
+| Customization option does not exist | `400`, `E000008` |
+| Customization is not available for the menu item | `400`, `E000009` |
+| Required/min/max customization rule fails | `400`, `E000010` |
 | Unexpected database failure | `500 Internal Server Error` |
 
-Planned exception handling should map invalid authentication to `401`, missing cart items to `404`, and insufficient inventory to `409`.
+Business failures are thrown as `BusinessException` and converted by `GlobalExceptionHandler` using `ErrorMapping`.
 
 ## Transaction Flow
 
@@ -109,7 +113,7 @@ quantity = 0? ── Yes → Delete and flush
   ↓
 Validate provided fields → Update quantity/note/customizations
   ↓
-Load remaining items
+Shared CartMapper loads remaining items
   ↓
 Recalculate totals
   ↓
@@ -118,9 +122,11 @@ Return updated cart
 
 ## Database Notes
 
-- Entities use the PostgreSQL `foodlane` schema.
+- Entities use the mainline PostgreSQL `foodland` schema.
 - Stored `cart_item.quantity` values are from `1` through `99`.
 - Quantity `0` causes deletion and is never persisted.
 - Customization quantity `0` removes the selected option and is never persisted.
+- An empty customization list deletes all customization rows only if every linked group permits zero selections.
 - Deleting a cart item cascades to its customization rows.
 - Customization prices come from server-side option prices and are saved as snapshots.
+- The shared `CartMapper` builds item/customization responses and recalculates totals.

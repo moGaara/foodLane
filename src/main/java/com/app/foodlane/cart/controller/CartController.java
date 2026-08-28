@@ -1,14 +1,18 @@
 package com.app.foodlane.cart.controller;
 
+import com.app.foodlane.cart.dto.request.AddToCartRequestDto;
 import com.app.foodlane.cart.dto.request.UpdateCartItemRequest;
 import com.app.foodlane.cart.dto.response.CartResponse;
-import com.app.foodlane.cart.dto.response.HelloDtoRes;
+import com.app.foodlane.cart.dto.response.CartResponseDto;
 import com.app.foodlane.cart.service.CartService;
-import com.app.foodlane.cart.service.IHelloService;
+import com.app.foodlane.cart.service.IDeleteCartItemService;
+import com.app.foodlane.cart.service.UpdateCartService;
 import com.app.foodlane.utils.CommonFunctions;
+import com.app.foodlane.utils.ErrorConstants;
 import com.app.foodlane.utils.reswrapper.GenericRes;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +23,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class CartController {
-    private final IHelloService iHelloService;
-    private final CartService cartService;
+    private final IDeleteCartItemService deleteCartItemService;
+    private final CartService addCartService;
+    private final UpdateCartService updateCartService;
 
-    @GetMapping("/hello")
-    public ResponseEntity<GenericRes<Void>> hello() {
-        GenericRes<Void> res = new GenericRes<>();
-        return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/hello/{name}")
-    public ResponseEntity<GenericRes<HelloDtoRes>> helloName(@PathVariable String name,
+    @DeleteMapping("/cart/cart-item/{cartItemId}")
+    public ResponseEntity<GenericRes<Void>> removeCartItem(
+            @PathVariable @Positive(message = ErrorConstants.INVALID_CART_ITEM_ID_CODE)
+            long cartItemId,
             @RequestHeader("Authorization") String authorization) {
-        long id = CommonFunctions.extractID(authorization);
-        HelloDtoRes serviceRes = iHelloService.helloDto(name, id);
-        GenericRes<HelloDtoRes> res = new GenericRes<>();
-        res.setBody(serviceRes);
+        long customerId = CommonFunctions.extractID(authorization);
+        deleteCartItemService.deleteItem(customerId, cartItemId);
+        GenericRes<Void> res = new GenericRes<>();
         return ResponseEntity.ok(res);
     }
 
@@ -51,7 +51,7 @@ public class CartController {
         Long customerId = CommonFunctions.extractID(auth);
         log.info("Received cart-item update: cartId={}, cartItemId={}, customerId={}",
                 cartId, cartItemId, customerId);
-        CartResponse serviceResponse = cartService.updateCartItem(
+        CartResponse serviceResponse = updateCartService.updateCartItem(
                 cartId,
                 cartItemId,
                 customerId,
@@ -59,5 +59,16 @@ public class CartController {
         GenericRes<CartResponse> resp = new GenericRes<>();
         resp.setBody(serviceResponse);
         return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/cart/items")
+    public ResponseEntity<GenericRes<CartResponseDto>> addItemToCart(
+            @RequestHeader("Authorization") String authorization,
+            @Valid @RequestBody AddToCartRequestDto request) {
+        long customerId = CommonFunctions.extractID(authorization);
+        CartResponseDto serviceResponse = addCartService.addItem(customerId, request);
+        GenericRes<CartResponseDto> response = new GenericRes<>();
+        response.setBody(serviceResponse);
+        return ResponseEntity.ok(response);
     }
 }
