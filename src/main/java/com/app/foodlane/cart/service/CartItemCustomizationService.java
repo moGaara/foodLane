@@ -1,4 +1,4 @@
-package com.app.foodlane.cart.service.impl;
+package com.app.foodlane.cart.service;
 
 import com.app.foodlane.cart.entity.CartItemCustomization;
 import com.app.foodlane.cart.repository.CartItemCustomizationRepository;
