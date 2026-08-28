@@ -15,7 +15,12 @@ public class MenuItemService {
     public MenuItem getById(Long id){
         return menuItemRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND , "menuItem not found"
-                ));
+                        HttpStatus.NOT_FOUND ,"MenuItem not found with ID: " + id)
+                );
+    }
+    public MenuItem getByIdWithCustomizations(Long id) {
+        return menuItemRepository.findByIdWithCustomizations(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "MenuItem not found with ID: " + id));
     }
 }
