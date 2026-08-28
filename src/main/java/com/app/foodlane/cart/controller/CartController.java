@@ -1,6 +1,7 @@
 package com.app.foodlane.cart.controller;
 
 import com.app.foodlane.cart.dto.response.HelloDtoRes;
+import com.app.foodlane.cart.service.IDeleteCartItemService;
 import com.app.foodlane.cart.service.IHelloService;
 import com.app.foodlane.utils.CommonFunctions;
 import com.app.foodlane.utils.reswrapper.GenericRes;
@@ -9,10 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
 public class CartController {
     private final IHelloService iHelloService;
+    private final IDeleteCartItemService iDeleteCartItemService;
 
     @GetMapping("/hello")
     public ResponseEntity<GenericRes<Void>> hello(){
@@ -26,6 +28,14 @@ public class CartController {
         HelloDtoRes serviceRes= iHelloService.helloDto(name, id);
         GenericRes<HelloDtoRes> res = new GenericRes<>();
         res.setBody(serviceRes);
+        return ResponseEntity.ok(res);
+    }
+    @DeleteMapping("/cart-item/{cartItemId}")
+    public ResponseEntity<GenericRes<Void>> removeCartItem(@PathVariable Long cartItemId,
+                                                             @RequestHeader("Authorization") String authorization){
+        long customerId = CommonFunctions.extractID(authorization);
+        iDeleteCartItemService.deleteItem(customerId, cartItemId);
+        GenericRes<Void> res = new GenericRes<>();
         return ResponseEntity.ok(res);
     }
 }
