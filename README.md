@@ -322,13 +322,38 @@ The following use cases represent the current Cart Management scope.
 | ID | Use Case | Status |
 |---|---|---|
 | UC-1 | Add Item to Cart | **Done - Hajar** |
-| UC-2 | Update Cart Item | Not-Yet |
+| UC-2 | Update Cart Item | **Done — Abdalla** |
 | UC-3 | Delete Cart Item | Not-Yet |
 | UC-4 | View Cart | Not-Yet |
 | UC-5 | Apply Promo Code | Later |
 | UC-6 | View Payment Summary | Not-Yet |
 | UC-7 | Add More Items from Same Restaurant | Later |
 | UC-8 | Proceed to Checkout | Later |
+
+---
+
+## UC-2 Update Cart Item — Documentation Map
+
+| Document | Purpose |
+|---|---|
+| [Use Case](design/cartModule/modify/UC-2-Update-Cart-Item.md) | Preconditions, main/alternative flows, business rules, and exceptions |
+| [API Design](design/cartModule/modify/Update-Cart-Item-API.md) | PATCH contract, request/response examples, validation codes, and database notes |
+| [Flowchart](design/cartModule/modify/Update-Cart-Item-Flowchart.md) | Decision flow for updates, deletion, inventory, and customizations |
+| [Sequence Diagram](design/cartModule/modify/Update-Cart-Item-Sequence.md) | Controller, service, repository, mapper, and database interactions |
+
+### Implementation Map
+
+```text
+PATCH /api/v1/carts/{cartId}/items/{cartItemId}
+  → CartController
+  → UpdateCartService / CartServiceImpl
+  → CartItemRepository and customization repositories
+  → PostgreSQL foodland schema
+  → shared CartMapper
+  → CartResponse
+```
+
+The update operation supports partial quantity, note, and customization changes. Cart-item quantity `0` deletes the entire item. Customization quantity `0` removes that option, while an empty customization list removes all selections only when every linked group is optional. Business failures are returned through `ErrorMapping` and `GlobalExceptionHandler`.
 
 ---
 
@@ -674,7 +699,6 @@ flowchart TD
 ```
 
 ---
-
 
 
 

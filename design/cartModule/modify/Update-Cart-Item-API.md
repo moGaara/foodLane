@@ -6,54 +6,43 @@
 PATCH /api/v1/carts/{cartId}/items/{cartItemId}
 ```
 
-## Purpose
-
-Updates one existing cart item without replacing the entire cart.
-
 ## Authentication
 
 ```http
-Authorization: Bearer <access-token>
+Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
-The authenticated customer must own the specified cart.
+The token payload currently contains `customerID`. The repository uses that ID to restrict the update to the customer's active cart.
 
 ## Path Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---:|---|
-| `cartId` | UUID/Long | Yes | Identifier of the customer's cart |
-| `cartItemId` | UUID/Long | Yes | Identifier of the cart item to update |
-
-> Use the project's existing ID type if the implementation already defines one.
+| `cartId` | Long | Yes | Cart identifier |
+| `cartItemId` | Long | Yes | Cart-item identifier |
 
 ## Request Body
-
-All fields are optional so the endpoint can support partial modification.
 
 ```json
 {
   "quantity": 2,
+  "itemNote": "No pickles please",
   "customizations": [
-    {
-      "id": 12,
-      "quantity": 1
-    }
-  ],
-  "note": "No onions"
+    { "customizationOptionId": 1, "quantity": 1 },
+    { "customizationOptionId": 3, "quantity": 1 }
+  ]
 }
 ```
 
-### Request Fields
-
 | Field | Type | Required | Rules |
 |---|---|---:|---|
-| `quantity` | integer | No | Must be >= 1 and within the allowed availability/quantity limit |
-| `customizations` | array | No | Must contain only valid customizations for the menu item |
-| `note` | string | No | Must satisfy the project's maximum note length |
+| `quantity` | integer | No | `0–99`; `0` deletes and `1–99` updates |
+| `itemNote` | string | No | Maximum 1000 characters; an empty string clears the visible note |
+| `customizations` | array | No | Replaces existing selections; options and group limits are validated |
 
-At least one editable field should be supplied.
+At least one editable field is required. Omitted fields remain unchanged.
+Each customization quantity accepts `0–6`; quantity `0` removes that option.
 
 ## Success Response
 
@@ -61,154 +50,83 @@ At least one editable field should be supplied.
 
 ```json
 {
-  "cartId": "cart-123",
-  "items": [
-    {
-      "cartItemId": "item-456",
-      "menuItemId": "menu-789",
-      "quantity": 2,
-      "customizations": [],
-      "note": "No onions",
-      "unitPrice": 12.50,
-      "subtotal": 25.00
-    }
-  ],
-  "subtotal": 25.00,
-  "total": 25.00
+  "header": {
+    "statusCode": "I000000",
+    "statusDesc": "Success"
+  },
+  "body": {
+    "cartId": 1,
+    "customerId": 1,
+    "restaurantId": 1,
+    "items": [
+      {
+        "cartId": 1,
+        "cartItemId": 1,
+        "menuItemId": 1,
+        "menuItemName": "Classic Cheeseburger",
+        "quantity": 2,
+        "unitPrice": 12.50,
+        "totalPrice": 29.00,
+        "itemNote": "No pickles please",
+        "customizations": [
+          {
+            "customizationOptionId": 3,
+            "name": "Extra Bacon",
+            "quantity": 1,
+            "unitPrice": 2.00,
+            "totalPrice": 2.00
+          }
+        ]
+      }
+    ],
+    "totalPrice": 29.00
+  }
 }
 ```
 
-The exact response fields should be aligned with the project's existing Cart DTO/model.
+For quantity `0`, the deleted item is absent from `items` and `totalPrice` is recalculated.
 
-## Error Responses
+## Validation and Errors
 
-### `400 Bad Request`
+| Condition | Current result |
+|---|---|
+| Missing authorization header | `400 Bad Request` |
+| Invalid body, negative/greater-than-99 quantity, oversized note, or no editable field | `400`, `E000005` |
+| Cart item does not match cart/customer/active status | `400`, `E000004` |
+| Quantity exceeds inventory | `400`, `E000006` |
+| Duplicate customization options | `400`, `E000007` |
+| Customization option does not exist | `400`, `E000008` |
+| Customization is not available for the menu item | `400`, `E000009` |
+| Required/min/max customization rule fails | `400`, `E000010` |
+| Unexpected database failure | `500 Internal Server Error` |
 
-Used for invalid request data.
+Business failures are thrown as `BusinessException` and converted by `GlobalExceptionHandler` using `ErrorMapping`.
 
-Examples:
-
-```json
-{
-  "code": "INVALID_QUANTITY",
-  "message": "Quantity must be at least 1."
-}
-```
-
-```json
-{
-  "code": "INVALID_CUSTOMIZATION",
-  "message": "The selected customization is not valid for this menu item."
-}
-```
-
-### `401 Unauthorized`
-
-Customer is not authenticated.
-
-### `403 Forbidden`
-
-The authenticated customer does not own the specified cart.
-
-### `404 Not Found`
-
-Possible cases:
-
-- Cart does not exist.
-- Cart item does not exist.
-
-Example:
-
-```json
-{
-  "code": "CART_ITEM_NOT_FOUND",
-  "message": "Cart item was not found."
-}
-```
-
-### `409 Conflict`
-
-Used when the request conflicts with the current cart/menu state.
-
-Examples:
-
-- Cart is no longer editable.
-- Menu item is unavailable.
-- Requested quantity exceeds current availability.
-
-Example:
-
-```json
-{
-  "code": "INSUFFICIENT_AVAILABILITY",
-  "message": "The requested quantity is not currently available."
-}
-```
-
-### `500 Internal Server Error`
-
-Unexpected persistence or server failure.
-
-## Update Rules
-
-### Increasing Quantity
-
-If the customer changes:
+## Transaction Flow
 
 ```text
-quantity: 2 → 5
-```
-
-the system must verify that the item can currently be supplied in quantity `5` before saving.
-
-### Decreasing Quantity
-
-If the customer changes:
-
-```text
-quantity: 5 → 2
-```
-
-the system validates the new quantity and updates the item.
-
-### Quantity = 0
-
-Quantity `0` is not accepted by this endpoint.
-
-```text
-PATCH quantity = 0
-        ↓
-400 INVALID_QUANTITY
-```
-
-The Remove Item endpoint/use case should be used instead.
-
-## Transaction / Consistency Requirement
-
-The update should behave as one logical operation:
-
-```text
-Validate
+Find and authorize CartItem
   ↓
-Update CartItem
+quantity = 0? ── Yes → Delete and flush
+  │
+  No
   ↓
-Recalculate Totals
+Validate provided fields → Update quantity/note/customizations
   ↓
-Persist
+Shared CartMapper loads remaining items
+  ↓
+Recalculate totals
+  ↓
+Return updated cart
 ```
 
-If persistence fails, the previous cart state must remain unchanged.
+## Database Notes
 
-## API Summary
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `PATCH` | `/api/v1/carts/{cartId}/items/{cartItemId}` | Partially update one cart item |
-
-## Notes for Implementation
-
-- Do not trust the client-provided price.
-- Recalculate the item's subtotal and cart total on the server.
-- Re-check availability when the requested quantity could affect availability constraints.
-- Keep the update transactional.
-- Do not allow a customer to update another customer's cart.
+- Entities use the mainline PostgreSQL `foodland` schema.
+- Stored `cart_item.quantity` values are from `1` through `99`.
+- Quantity `0` causes deletion and is never persisted.
+- Customization quantity `0` removes the selected option and is never persisted.
+- An empty customization list deletes all customization rows only if every linked group permits zero selections.
+- Deleting a cart item cascades to its customization rows.
+- Customization prices come from server-side option prices and are saved as snapshots.
+- The shared `CartMapper` builds item/customization responses and recalculates totals.

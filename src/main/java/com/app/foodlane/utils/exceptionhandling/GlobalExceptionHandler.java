@@ -9,10 +9,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResHeader> handleRequestBodyValidation(
+            MethodArgumentNotValidException ex) {
+        String errorCode = ex.getBindingResult().getAllErrors().stream()
+                .findFirst()
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .orElse(ErrorMapping.SOMETHING_WENT_WRONG.getCode());
+        ErrorMapping error = ErrorMapping.getErrorByCode(errorCode);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ResHeader.builder()
+                        .statusCode(error.getCode())
+                        .statusDesc(error.getDesc())
+                        .build());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ResHeader> handleConstraintViolation(ConstraintViolationException ex) {
         String errorCode = ex.getConstraintViolations().iterator().next().getMessage();

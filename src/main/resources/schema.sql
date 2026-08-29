@@ -20,7 +20,6 @@ CREATE TABLE customer
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-
 -- ============================================================
 -- 2. RESTAURANT
 -- ============================================================
@@ -287,4 +286,3 @@ CREATE TABLE cart_item_customization
     CONSTRAINT uq_cart_item_option
         UNIQUE (cart_item_id, customization_option_id)
 );
-

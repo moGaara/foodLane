@@ -40,4 +40,10 @@ public class CustomizationOption {
     @Builder.Default
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
+
+    @NotNull
+    @PositiveOrZero(message = "Inventory selected cannot be negative")
+    @Builder.Default
+    @Column(name = "inventory_quantity", nullable = false)
+    private Integer inventoryQuantity = 0;
 }
