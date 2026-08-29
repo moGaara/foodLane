@@ -4,5 +4,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record CustomizationSelectionDto(@NotNull Long customizationOptionId,
-                                        @Min(1) Integer selected) {
+                                        @Min(1) Integer selected,
+                                        Integer quantity) { // to run the app
 }

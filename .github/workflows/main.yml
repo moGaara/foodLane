@@ -1,0 +1,67 @@
+name: Java CI pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - feature/github-ci-cd
+
+jobs:
+  ci-pipeline:
+    name: Springboot CI pipeline
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_SQL_INIT_MODE: always
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Create temporary .env file
+        run: |
+          cat <<EOF > .env
+          POSTGRES_DB=$POSTGRES_DB
+          POSTGRES_USER=$POSTGRES_USER
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/$POSTGRES_DB
+          SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
+          SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME=$SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          SPRING_SQL_INIT_MODE=$SPRING_SQL_INIT_MODE
+          SPRING_JPA_HIBERNATE_DDL_AUTO=$SPRING_JPA_HIBERNATE_DDL_AUTO
+          EOF
+
+      - name: Start PostgreSQL via Docker Compose
+        run: |
+            docker compose up postgres -d
+            echo "Waiting for database to become healthy..."
+            until [ "$(docker inspect --format='{{json .State.Health.Status}}' food_lane_db)" == '"healthy"' ]; do
+              sleep 2
+            done
+            echo "Database is ready!"
+
+      - name: Build and Test Project
+        run: mvn -B clean verify --file pom.xml
+
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down -v
