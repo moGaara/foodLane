@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.app.foodlane.restaurant.repository.CustomizationOptionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,6 @@ import com.app.foodlane.cart.entity.CartItem;
 import com.app.foodlane.cart.mapper.CartMapper;
 import com.app.foodlane.cart.repository.CartItemCustomizationRepository;
 import com.app.foodlane.cart.repository.CartItemRepository;
-import com.app.foodlane.cart.repository.CustomizationOptionRepository;
 import com.app.foodlane.restaurant.entity.CustomizationGroup;
 import com.app.foodlane.restaurant.entity.CustomizationOption;
 import com.app.foodlane.restaurant.entity.MenuItem;
