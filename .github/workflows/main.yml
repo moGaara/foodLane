@@ -59,13 +59,8 @@ jobs:
             done
             echo "Database is ready!"
 
-      - name: Compile Code
-        run: mvn -B package --file pom.xml
-
-      - name: Run Unit Tests
-        run: |
-          mvn clean
-          mvn -B test --file pom.xml
+      - name: Build and Test Project
+        run: mvn -B clean verify --file pom.xml
 
       - name: Stop Docker Services
         if: always()
