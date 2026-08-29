@@ -1,0 +1,54 @@
+name: Java CI pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - feature/github-ci-cd
+
+jobs:
+  ci-pipeline:
+    name: Springboot CI pipeline
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: foodlane_db
+      POSTGRES_USER: foodlane_user
+      POSTGRES_PASSWORD: foodlane_password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/foodlane_db
+      SPRING_DATASOURCE_USERNAME: foodlane_user
+      SPRING_DATASOURCE_PASSWORD: foodlane_password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_SQL_INIT_MODE: always
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Start PostgreSQL via Docker Compose
+        run: |
+            docker compose up postgres -d
+            echo "Waiting for database to become healthy..."
+            until [ "$(docker inspect --format='{{json .State.Health.Status}}' food_lane_db)" == '"healthy"' ]; do
+              sleep 2
+            done
+            echo "Database is ready!"
+
+      - name: Run Unit Tests
+        run: mvn -B test --file pom.xml
+
+      - name: Compile Code
+        run: |
+          mvn clean 
+          mvn -B package --file pom.xml
