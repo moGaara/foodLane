@@ -36,6 +36,17 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Create temporary .env file
+        run: |
+          cat <<EOF > .env
+          POSTGRES_DB=$POSTGRES_DB
+          POSTGRES_USER=$POSTGRES_USER
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME=$SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          SPRING_SQL_INIT_MODE=$SPRING_SQL_INIT_MODE
+          SPRING_JPA_HIBERNATE_DDL_AUTO=$SPRING_JPA_HIBERNATE_DDL_AUTO
+          EOF
+
       - name: Start PostgreSQL via Docker Compose
         run: |
             docker compose up postgres -d
