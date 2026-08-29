@@ -15,12 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      POSTGRES_DB: foodlane_db
-      POSTGRES_USER: foodlane_user
-      POSTGRES_PASSWORD: foodlane_password
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/foodlane_db
-      SPRING_DATASOURCE_USERNAME: foodlane_user
-      SPRING_DATASOURCE_PASSWORD: foodlane_password
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_SQL_INIT_MODE: always
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
@@ -42,6 +39,9 @@ jobs:
           POSTGRES_DB=$POSTGRES_DB
           POSTGRES_USER=$POSTGRES_USER
           POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/$POSTGRES_DB
+          SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
+          SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
           SPRING_DATASOURCE_DRIVER_CLASS_NAME=$SPRING_DATASOURCE_DRIVER_CLASS_NAME
           SPRING_SQL_INIT_MODE=$SPRING_SQL_INIT_MODE
           SPRING_JPA_HIBERNATE_DDL_AUTO=$SPRING_JPA_HIBERNATE_DDL_AUTO
