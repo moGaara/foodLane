@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.app.foodlane.restaurant.repository.CustomizationOptionRepository;
 import org.springframework.stereotype.Service;
 
 import com.app.foodlane.cart.dto.request.CartItemCustomizationRequest;
@@ -19,7 +20,6 @@ import com.app.foodlane.cart.entity.CartItemCustomization;
 import com.app.foodlane.cart.mapper.CartMapper;
 import com.app.foodlane.cart.repository.CartItemCustomizationRepository;
 import com.app.foodlane.cart.repository.CartItemRepository;
-import com.app.foodlane.cart.repository.CustomizationOptionRepository;
 import com.app.foodlane.cart.service.UpdateCartService;
 import com.app.foodlane.restaurant.entity.CustomizationGroup;
 import com.app.foodlane.restaurant.entity.CustomizationOption;
