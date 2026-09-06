@@ -27,14 +27,14 @@ sequenceDiagram
         Service->>Repository: delete(cartItem) and flush
         Repository->>DB: DELETE cart_item
         Note over DB: Customizations deleted by ON DELETE CASCADE
-        Service->>Mapper: toCartResponse(cart)
+        Service->>Mapper: toCartResponseDto(cart)
         Mapper->>Repository: findAllByCartCartId(cartId)
         Repository->>DB: SELECT remaining items
         DB-->>Mapper: Remaining items
         Mapper->>Mapper: Map responses and recalculate total
-        Mapper-->>Service: Updated CartResponse
-        Service-->>Controller: Updated CartResponse
-        Controller-->>Client: 200 OK and GenericRes CartResponse
+        Mapper-->>Service: Updated CartResponseDto
+        Service-->>Controller: Updated CartResponseDto
+        Controller-->>Client: 200 OK and GenericRes CartResponseDto
     else Quantity between 1 and 99
         Service->>Service: Validate menu-item inventory
         alt Quantity exceeds inventory
@@ -44,14 +44,14 @@ sequenceDiagram
             Service->>Service: Apply provided note and validate customizations
             Service->>Repository: Replace provided customizations and save CartItem
             Repository->>DB: UPDATE cart_item quantity
-            Service->>Mapper: toCartResponse(cart)
+            Service->>Mapper: toCartResponseDto(cart)
             Mapper->>Repository: findAllByCartCartId(cartId)
             Repository->>DB: SELECT cart items
             DB-->>Mapper: Updated items
             Mapper->>Mapper: Map responses and recalculate total
-            Mapper-->>Service: Updated CartResponse
-            Service-->>Controller: Updated CartResponse
-            Controller-->>Client: 200 OK and GenericRes CartResponse
+            Mapper-->>Service: Updated CartResponseDto
+            Service-->>Controller: Updated CartResponseDto
+            Controller-->>Client: 200 OK and GenericRes CartResponseDto
         end
     end
 

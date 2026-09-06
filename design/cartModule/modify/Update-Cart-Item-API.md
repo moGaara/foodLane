@@ -56,35 +56,33 @@ Each customization quantity accepts `0–6`; quantity `0` removes that option.
   },
   "body": {
     "cartId": 1,
-    "customerId": 1,
     "restaurantId": 1,
+    "restaurantName": "Urban Burger",
     "items": [
       {
-        "cartId": 1,
         "cartItemId": 1,
         "menuItemId": 1,
         "menuItemName": "Classic Cheeseburger",
-        "quantity": 2,
         "unitPrice": 12.50,
-        "totalPrice": 29.00,
+        "quantity": 2,
         "itemNote": "No pickles please",
+        "itemTotalPrice": 29.00,
         "customizations": [
           {
             "customizationOptionId": 3,
-            "name": "Extra Bacon",
-            "quantity": 1,
-            "unitPrice": 2.00,
-            "totalPrice": 2.00
+            "optionName": "Extra Bacon",
+            "priceSnapshot": 2.00,
+            "quantity": 1
           }
         ]
       }
     ],
-    "totalPrice": 29.00
+    "subtotal": 29.00
   }
 }
 ```
 
-For quantity `0`, the deleted item is absent from `items` and `totalPrice` is recalculated.
+For quantity `0`, the deleted item is absent from `items` and `subtotal` is recalculated.
 
 ## Validation and Errors
 
@@ -129,4 +127,4 @@ Return updated cart
 - An empty customization list deletes all customization rows only if every linked group permits zero selections.
 - Deleting a cart item cascades to its customization rows.
 - Customization prices come from server-side option prices and are saved as snapshots.
-- The shared `CartMapper` builds item/customization responses and recalculates totals.
+- Add-cart and update-cart both return Hajar's `CartResponseDto` through the shared `CartMapper.toCartResponseDto()` method.
