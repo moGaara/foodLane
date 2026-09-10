@@ -13,6 +13,10 @@ public class ErrorConstants {
     public static final String CUSTOMIZATION_NOT_EXIST_CODE = "E000008";
     public static final String CUSTOMIZATION_NOT_ALLOWED_CODE = "E000009";
     public static final String INVALID_CUSTOMIZATION_SELECTION_CODE = "E000010";
+    public static final String ACTIVE_CART_NOT_FOUND_CODE = "E000011";
+    public static final String EMPTY_CART_CODE = "E000012";
+    public static final String RESTAURANT_CLOSED_CODE = "E000013";
+    public static final String DELIVERY_ADDRESS_NOT_FOUND_CODE = "E000014";
 
 
     // descriptions
@@ -27,4 +31,8 @@ public class ErrorConstants {
     public static final String CUSTOMIZATION_NOT_EXIST_DESC = "One or more customization options do not exist";
     public static final String CUSTOMIZATION_NOT_ALLOWED_DESC = "Customization option is not available for this menu item";
     public static final String INVALID_CUSTOMIZATION_SELECTION_DESC = "Invalid number of customization selections";
+    public static final String ACTIVE_CART_NOT_FOUND_DESC = "Active cart not found";
+    public static final String EMPTY_CART_DESC = "Cannot place an order with an empty cart";
+    public static final String RESTAURANT_CLOSED_DESC = "Restaurant is currently closed";
+    public static final String DELIVERY_ADDRESS_NOT_FOUND_DESC = "Delivery address not found";
 }
