@@ -17,6 +17,8 @@ Order Management
 Payment Management
    ↓
 Delivery
+   ↓
+Dashboard
 ```
 
 
@@ -350,7 +352,7 @@ PATCH /api/v1/carts/{cartId}/items/{cartItemId}
   → CartItemRepository and customization repositories
   → PostgreSQL foodland schema
   → shared CartMapper
-  → CartResponse
+  → CartResponseDto
 ```
 
 The update operation supports partial quantity, note, and customization changes. Cart-item quantity `0` deletes the entire item. Customization quantity `0` removes that option, while an empty customization list removes all selections only when every linked group is optional. Business failures are returned through `ErrorMapping` and `GlobalExceptionHandler`.
@@ -699,7 +701,6 @@ flowchart TD
 ```
 
 ---
-
 
 
 

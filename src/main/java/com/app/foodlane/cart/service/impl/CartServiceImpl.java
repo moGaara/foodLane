@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.foodlane.cart.dto.request.CartItemCustomizationRequest;
 import com.app.foodlane.cart.dto.request.UpdateCartItemRequest;
-import com.app.foodlane.cart.dto.response.CartResponse;
+import com.app.foodlane.cart.dto.response.CartResponseDto;
 import com.app.foodlane.cart.entity.Cart;
 import com.app.foodlane.cart.entity.CartItem;
 import com.app.foodlane.cart.entity.CartItemCustomization;
@@ -43,7 +43,7 @@ public class CartServiceImpl implements UpdateCartService {
      */
     @Override
     @Transactional
-    public CartResponse updateCartItem(
+    public CartResponseDto updateCartItem(
             Long cartId,
             Long cartItemId,
             Long customerId,
@@ -64,7 +64,7 @@ public class CartServiceImpl implements UpdateCartService {
             cartItemRepository.delete(cartItem);
             cartItemRepository.flush();
             log.info("Cart item deleted: cartId={}, cartItemId={}", cartId, cartItemId);
-            return cartMapper.toCartResponse(cart);
+            return cartMapper.toCartResponseDto(cart);
         }
 
         if (request.getQuantity() != null) {
@@ -83,7 +83,7 @@ public class CartServiceImpl implements UpdateCartService {
         cartItemRepository.save(cartItem);
         log.info("Cart item updated: cartId={}, cartItemId={}, quantity={}",
                 cartId, cartItemId, cartItem.getQuantity());
-        return cartMapper.toCartResponse(cart);
+        return cartMapper.toCartResponseDto(cart);
     }
 
     private void validateInventory(CartItem cartItem, Integer quantity) {

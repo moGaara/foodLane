@@ -5,11 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.app.foodlane.cart.dto.response.CartItemCustomizationResponse;
 import com.app.foodlane.cart.dto.response.CartItemCustomizationResponseDto;
-import com.app.foodlane.cart.dto.response.CartItemResponse;
 import com.app.foodlane.cart.dto.response.CartItemResponseDto;
-import com.app.foodlane.cart.dto.response.CartResponse;
 import com.app.foodlane.cart.dto.response.CartResponseDto;
 import com.app.foodlane.cart.entity.Cart;
 import com.app.foodlane.cart.entity.CartItem;
@@ -26,26 +23,7 @@ public class CartMapper {
     private final CartItemRepository cartItemRepository;
     private final CartItemCustomizationRepository cartItemCustomizationRepository;
 
-    public CartResponse toCartResponse(Cart cart) {
-        List<CartItemResponse> items = cartItemRepository.findAllByCartCartId(cart.getCartId())
-                .stream()
-                .map(this::toCartItemResponse)
-                .toList();
-
-        BigDecimal totalPrice = items.stream()
-                .map(CartItemResponse::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return CartResponse.builder()
-                .cartId(cart.getCartId())
-                .customerId(cart.getCustomer().getCustomerId())
-                .restaurantId(cart.getRestaurant().getRestaurantId())
-                .items(items)
-                .totalPrice(totalPrice)
-                .build();
-    }
-
-    /** Maps the same cart to the response contract used by mainline add-cart. */
+    /** Maps a cart to the response contract shared by add-cart and update-cart. */
     public CartResponseDto toCartResponseDto(Cart cart) {
         List<CartItemResponseDto> items = cartItemRepository.findAllByCartCartId(cart.getCartId())
                 .stream()
@@ -62,49 +40,6 @@ public class CartMapper {
                 cart.getRestaurant().getName(),
                 items,
                 subtotal);
-    }
-
-    private CartItemResponse toCartItemResponse(CartItem cartItem) {
-        List<CartItemCustomizationResponse> customizations = cartItemCustomizationRepository
-                .findAllByCartItemCartItemId(cartItem.getCartItemId())
-                .stream()
-                .map(this::toCustomizationResponse)
-                .toList();
-
-        BigDecimal customizationUnitTotal = customizations.stream()
-                .map(CartItemCustomizationResponse::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal totalPrice = cartItem.getUnitPriceSnapshot()
-                .add(customizationUnitTotal)
-                .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-
-        return CartItemResponse.builder()
-                .cartId(cartItem.getCart().getCartId())
-                .cartItemId(cartItem.getCartItemId())
-                .menuItemId(cartItem.getMenuItem().getMenuItemId())
-                .menuItemName(cartItem.getMenuItem().getName())
-                .quantity(cartItem.getQuantity())
-                .unitPrice(cartItem.getUnitPriceSnapshot())
-                .totalPrice(totalPrice)
-                .itemNote(cartItem.getItemNote())
-                .customizations(customizations)
-                .build();
-    }
-
-    private CartItemCustomizationResponse toCustomizationResponse(
-            CartItemCustomization customization) {
-        BigDecimal totalPrice = customization.getPriceSnapshot()
-                .multiply(BigDecimal.valueOf(customization.getQuantity()));
-
-        return CartItemCustomizationResponse.builder()
-                .customizationOptionId(
-                        customization.getCustomizationOption().getCustomizationOptionId())
-                .name(customization.getCustomizationOption().getName())
-                .quantity(customization.getQuantity())
-                .unitPrice(customization.getPriceSnapshot())
-                .totalPrice(totalPrice)
-                .build();
     }
 
     private CartItemResponseDto toCartItemResponseDto(CartItem cartItem) {

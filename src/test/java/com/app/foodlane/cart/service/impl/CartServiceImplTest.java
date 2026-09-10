@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.app.foodlane.cart.dto.request.CartItemCustomizationRequest;
 import com.app.foodlane.cart.dto.request.UpdateCartItemRequest;
-import com.app.foodlane.cart.dto.response.CartResponse;
+import com.app.foodlane.cart.dto.response.CartResponseDto;
 import com.app.foodlane.cart.entity.Cart;
 import com.app.foodlane.cart.entity.CartItem;
 import com.app.foodlane.cart.mapper.CartMapper;
@@ -52,7 +52,7 @@ class CartServiceImplTest {
     private Cart cart;
     private CartItem cartItem;
     private MenuItem menuItem;
-    private CartResponse expectedResponse;
+    private CartResponseDto expectedResponse;
 
     @BeforeEach
     void setup() {
@@ -65,7 +65,7 @@ class CartServiceImplTest {
                 .quantity(2)
                 .unitPriceSnapshot(new BigDecimal("12.50"))
                 .build();
-        expectedResponse = CartResponse.builder().cartId(1L).build();
+        expectedResponse = new CartResponseDto(1L, 1L, "Restaurant", List.of(), BigDecimal.ZERO);
     }
 
     @Test
@@ -73,14 +73,14 @@ class CartServiceImplTest {
         UpdateCartItemRequest request = new UpdateCartItemRequest();
         request.setQuantity(4);
         mockExistingCartItem();
-        when(cartMapper.toCartResponse(cart)).thenReturn(expectedResponse);
+        when(cartMapper.toCartResponseDto(cart)).thenReturn(expectedResponse);
 
-        CartResponse response = cartService.updateCartItem(1L, 5L, 1L, request);
+        CartResponseDto response = cartService.updateCartItem(1L, 5L, 1L, request);
 
         assertEquals(4, cartItem.getQuantity());
         assertSame(expectedResponse, response);
         verify(cartItemRepository).save(cartItem);
-        verify(cartMapper).toCartResponse(cart);
+        verify(cartMapper).toCartResponseDto(cart);
     }
 
     @Test
@@ -88,9 +88,9 @@ class CartServiceImplTest {
         UpdateCartItemRequest request = new UpdateCartItemRequest();
         request.setQuantity(0);
         mockExistingCartItem();
-        when(cartMapper.toCartResponse(cart)).thenReturn(expectedResponse);
+        when(cartMapper.toCartResponseDto(cart)).thenReturn(expectedResponse);
 
-        CartResponse result = cartService.updateCartItem(1L, 5L, 1L, request);
+        CartResponseDto result = cartService.updateCartItem(1L, 5L, 1L, request);
 
         verify(cartItemRepository).delete(cartItem);
         verify(cartItemRepository).flush();
@@ -137,9 +137,9 @@ class CartServiceImplTest {
         UpdateCartItemRequest request = new UpdateCartItemRequest();
         request.setItemNote("Extra sauce");
         mockExistingCartItem();
-        when(cartMapper.toCartResponse(cart)).thenReturn(expectedResponse);
+        when(cartMapper.toCartResponseDto(cart)).thenReturn(expectedResponse);
 
-        CartResponse result = cartService.updateCartItem(1L, 5L, 1L, request);
+        CartResponseDto result = cartService.updateCartItem(1L, 5L, 1L, request);
 
         assertEquals("Extra sauce", cartItem.getItemNote());
         assertSame(expectedResponse, result);
@@ -165,9 +165,9 @@ class CartServiceImplTest {
         mockExistingCartItem();
         when(customizationOptionRepository.findAllById(Set.of(3L)))
                 .thenReturn(List.of(bacon));
-        when(cartMapper.toCartResponse(cart)).thenReturn(expectedResponse);
+        when(cartMapper.toCartResponseDto(cart)).thenReturn(expectedResponse);
 
-        CartResponse result = cartService.updateCartItem(1L, 5L, 1L, request);
+        CartResponseDto result = cartService.updateCartItem(1L, 5L, 1L, request);
 
         verify(cartItemCustomizationRepository).deleteAllByCartItemCartItemId(5L);
         verify(cartItemCustomizationRepository).flush();
@@ -183,9 +183,9 @@ class CartServiceImplTest {
 
         mockExistingCartItem();
         when(customizationOptionRepository.findAllById(Set.of())).thenReturn(List.of());
-        when(cartMapper.toCartResponse(cart)).thenReturn(expectedResponse);
+        when(cartMapper.toCartResponseDto(cart)).thenReturn(expectedResponse);
 
-        CartResponse result = cartService.updateCartItem(1L, 5L, 1L, request);
+        CartResponseDto result = cartService.updateCartItem(1L, 5L, 1L, request);
 
         verify(cartItemCustomizationRepository).deleteAllByCartItemCartItemId(5L);
         verify(cartItemCustomizationRepository).flush();

@@ -2,7 +2,6 @@ package com.app.foodlane.cart.controller;
 
 import com.app.foodlane.cart.dto.request.AddToCartRequestDto;
 import com.app.foodlane.cart.dto.request.UpdateCartItemRequest;
-import com.app.foodlane.cart.dto.response.CartResponse;
 import com.app.foodlane.cart.dto.response.CartResponseDto;
 import com.app.foodlane.cart.service.CartService;
 import com.app.foodlane.cart.service.IDeleteCartItemService;
@@ -43,7 +42,7 @@ public class CartController {
      * Omitted fields remain unchanged, while quantity zero removes the item.
      */
     @PatchMapping("/carts/{cartId}/items/{cartItemId}")
-    public ResponseEntity<GenericRes<CartResponse>> updateCartItem(
+    public ResponseEntity<GenericRes<CartResponseDto>> updateCartItem(
             @PathVariable Long cartId,
             @PathVariable Long cartItemId,
             @Valid @RequestBody UpdateCartItemRequest request,
@@ -51,12 +50,12 @@ public class CartController {
         Long customerId = CommonFunctions.extractID(auth);
         log.info("Received cart-item update: cartId={}, cartItemId={}, customerId={}",
                 cartId, cartItemId, customerId);
-        CartResponse serviceResponse = updateCartService.updateCartItem(
+        CartResponseDto serviceResponse = updateCartService.updateCartItem(
                 cartId,
                 cartItemId,
                 customerId,
                 request);
-        GenericRes<CartResponse> resp = new GenericRes<>();
+        GenericRes<CartResponseDto> resp = new GenericRes<>();
         resp.setBody(serviceResponse);
         return ResponseEntity.ok(resp);
     }
