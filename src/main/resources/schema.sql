@@ -400,14 +400,13 @@ CREATE TABLE order_status
 );
 
 INSERT INTO order_status (status_id, code, description) VALUES
-(1, 'PLACED', 'Order submitted by customer'),
+(1, 'PENDING', 'Order was placed and awaits restaurant confirmation'),
 (2, 'ACCEPTED', 'Order accepted by restaurant'),
 (3, 'PREPARING', 'Kitchen is preparing the food'),
 (4, 'READY_FOR_PICKUP', 'Food is ready for driver pickup'),
 (5, 'OUT_FOR_DELIVERY', 'Courier picked up order and is en route'),
 (6, 'DELIVERED', 'Order handed over to customer'),
-(7, 'CANCELLED', 'Order was cancelled'),
-(8 , 'PENDING' , 'Order was placed and awaits restaurant confirmation');
+(7, 'CANCELLED', 'Order was cancelled');
 
 
 
