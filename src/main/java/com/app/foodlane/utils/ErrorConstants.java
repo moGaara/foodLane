@@ -17,6 +17,9 @@ public class ErrorConstants {
     public static final String EMPTY_CART_CODE = "E000012";
     public static final String RESTAURANT_CLOSED_CODE = "E000013";
     public static final String DELIVERY_ADDRESS_NOT_FOUND_CODE = "E000014";
+    public static final String ORDER_NOT_FOUND_CODE = "E000015";
+public static final String ORDER_STATUS_NOT_FOUND_CODE = "E000016";
+public static final String INVALID_ORDER_STATUS_TRANSITION_CODE = "E000017";
 
 
     // descriptions
@@ -35,4 +38,8 @@ public class ErrorConstants {
     public static final String EMPTY_CART_DESC = "Cannot place an order with an empty cart";
     public static final String RESTAURANT_CLOSED_DESC = "Restaurant is currently closed";
     public static final String DELIVERY_ADDRESS_NOT_FOUND_DESC = "Delivery address not found";
+    public static final String ORDER_NOT_FOUND_DESC = "Order not found";
+public static final String ORDER_STATUS_NOT_FOUND_DESC = "Order status not found";
+public static final String INVALID_ORDER_STATUS_TRANSITION_DESC =
+        "Order status transition is not allowed";
 }
