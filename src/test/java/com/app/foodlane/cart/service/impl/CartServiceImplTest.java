@@ -62,7 +62,7 @@ class CartServiceImplTest {
                 .cartItemId(5L)
                 .cart(cart)
                 .menuItem(menuItem)
-                .quantity(2)
+                .selected(2)
                 .unitPriceSnapshot(new BigDecimal("12.50"))
                 .build();
         expectedResponse = new CartResponseDto(1L, 1L, "Restaurant", List.of(), BigDecimal.ZERO);
@@ -77,7 +77,7 @@ class CartServiceImplTest {
 
         CartResponseDto response = cartService.updateCartItem(1L, 5L, 1L, request);
 
-        assertEquals(4, cartItem.getQuantity());
+        assertEquals(4, cartItem.getSelected());
         assertSame(expectedResponse, response);
         verify(cartItemRepository).save(cartItem);
         verify(cartMapper).toCartResponseDto(cart);
@@ -127,7 +127,7 @@ class CartServiceImplTest {
                 () -> cartService.updateCartItem(1L, 5L, 1L, request));
 
         assertEquals(ErrorMapping.INSUFFICIENT_INVENTORY.getCode(), exception.getCode());
-        assertEquals(2, cartItem.getQuantity());
+        assertEquals(2, cartItem.getSelected());
         verify(cartItemRepository, never()).save(any());
         verifyNoInteractions(cartMapper);
     }
