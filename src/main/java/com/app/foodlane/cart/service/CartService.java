@@ -88,7 +88,7 @@ public class CartService {
             if (identicalItemOpt.isPresent()) {
                 // identical customizations & note
                 CartItem identicalItem = identicalItemOpt.get();
-                identicalItem.setQuantity(identicalItem.getQuantity() + requestDto.menuItemQuantity());
+                identicalItem.setSelected(identicalItem.getSelected() + requestDto.menuItemQuantity());
             } else {
                 // different customizations & note
                 CartItem newItem = createCartItem(cart, menuItem, requestDto);
@@ -137,7 +137,7 @@ public class CartService {
     private CartItem createCartItem(Cart existedCart , MenuItem menuItem, AddToCartRequestDto requestDto) {
         CartItem cartItem = CartItem.builder()
                 .itemNote(requestDto.menuItemNote())
-                .quantity(requestDto.menuItemQuantity())
+                .selected(requestDto.menuItemQuantity())
                 .cart(existedCart)
                 .unitPriceSnapshot(menuItem.getPrice())
                 .menuItem(menuItem)
@@ -157,7 +157,7 @@ public class CartService {
                     .cartItem(savedCartItem)
                     .customizationOption(customizationOption)
                     .priceSnapshot(customizationOption.getPrice())
-                    .quantity(customization.selected())
+                    .selected(customization.selected())
                     .build();
             cartItemCustomizationService.saveEntity(cartItemCustomization);
         }
@@ -196,7 +196,7 @@ public class CartService {
             Long existingOptionId = existing.getCustomizationOption().getCustomizationOptionId();
             Integer incomingQuantity = incomingMap.get(existingOptionId);
 
-            return incomingQuantity != null && incomingQuantity.equals(existing.getQuantity());
+            return incomingQuantity != null && incomingQuantity.equals(existing.getSelected());
         });
     }
 
