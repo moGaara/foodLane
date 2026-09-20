@@ -3,6 +3,7 @@ package com.app.foodlane.Auth.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -44,10 +45,10 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(name = "role", nullable = false, length = 50)
-    private String role;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false, length = 20)
+    private UserRole role;
 
     @Builder.Default
     @Column(name = "is_active", nullable = false)

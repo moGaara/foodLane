@@ -20,6 +20,8 @@ public class ErrorConstants {
     public static final String ORDER_NOT_FOUND_CODE = "E000015";
 public static final String ORDER_STATUS_NOT_FOUND_CODE = "E000016";
 public static final String INVALID_ORDER_STATUS_TRANSITION_CODE = "E000017";
+    public static final String USER_NOT_FOUND_CODE = "E000018";
+    public static final String ORDER_STATUS_UPDATE_FORBIDDEN_CODE = "E000019";
 
 
     // descriptions
@@ -42,4 +44,7 @@ public static final String INVALID_ORDER_STATUS_TRANSITION_CODE = "E000017";
 public static final String ORDER_STATUS_NOT_FOUND_DESC = "Order status not found";
 public static final String INVALID_ORDER_STATUS_TRANSITION_DESC =
         "Order status transition is not allowed";
+    public static final String USER_NOT_FOUND_DESC = "User not found";
+    public static final String ORDER_STATUS_UPDATE_FORBIDDEN_DESC =
+            "User is not allowed to update this order status";
 }
