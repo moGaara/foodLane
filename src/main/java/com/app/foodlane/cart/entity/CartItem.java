@@ -43,7 +43,7 @@ public class CartItem {
     @Min(value = 1, message = "Quantity must be at least 1")
     @Max(value = 99, message = "Quantity cannot exceed 99")
     @Column(name = "selected", nullable = false)
-    private Integer quantity;
+    private Integer selected;
 
     @NotNull(message = "Unit price snapshot is required")
     @PositiveOrZero(message = "Unit price snapshot must be positive or zero")

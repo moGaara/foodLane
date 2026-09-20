@@ -69,7 +69,7 @@ public class CartServiceImpl implements UpdateCartService {
 
         if (request.getQuantity() != null) {
             validateInventory(cartItem, request.getQuantity());
-            cartItem.setQuantity(request.getQuantity());
+            cartItem.setSelected(request.getQuantity());
         }
 
         if (request.getItemNote() != null) {
@@ -82,7 +82,7 @@ public class CartServiceImpl implements UpdateCartService {
 
         cartItemRepository.save(cartItem);
         log.info("Cart item updated: cartId={}, cartItemId={}, quantity={}",
-                cartId, cartItemId, cartItem.getQuantity());
+                cartId, cartItemId, cartItem.getSelected());
         return cartMapper.toCartResponseDto(cart);
     }
 
@@ -171,7 +171,7 @@ public class CartServiceImpl implements UpdateCartService {
                             .customizationOption(option)
                             // Never trust a client-provided price; snapshot the current DB price.
                             .priceSnapshot(option.getPrice())
-                            .quantity(request.getQuantity())
+                            .selected(request.getQuantity())
                             .build();
                 })
                 .toList();

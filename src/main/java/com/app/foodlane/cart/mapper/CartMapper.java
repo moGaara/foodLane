@@ -56,14 +56,14 @@ public class CartMapper {
 
         BigDecimal itemTotalPrice = cartItem.getUnitPriceSnapshot()
                 .add(customizationUnitTotal)
-                .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+                .multiply(BigDecimal.valueOf(cartItem.getSelected()));
 
         return new CartItemResponseDto(
                 cartItem.getCartItemId(),
                 cartItem.getMenuItem().getMenuItemId(),
                 cartItem.getMenuItem().getName(),
                 cartItem.getUnitPriceSnapshot(),
-                cartItem.getQuantity(),
+                cartItem.getSelected(),
                 cartItem.getItemNote(),
                 itemTotalPrice,
                 customizations);
@@ -75,6 +75,6 @@ public class CartMapper {
                 customization.getCustomizationOption().getCustomizationOptionId(),
                 customization.getCustomizationOption().getName(),
                 customization.getPriceSnapshot(),
-                customization.getQuantity());
+                customization.getSelected());
     }
 }
